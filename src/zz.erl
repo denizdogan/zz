@@ -22,6 +22,8 @@ path-addressed list of issues with `issues/1`.
     binary/0,
     binary/1,
     boolean/0,
+    char/0,
+    char_list/0,
     float/0,
     float/1,
     integer/0,
@@ -162,6 +164,28 @@ boolean() ->
         (_Invalid) ->
             {error, [not_boolean]}
     end.
+
+-doc """
+Validate that input is a single Unicode codepoint (`t:char/0`), an
+integer in `0..16#10FFFF`.
+""".
+-spec char() -> parser(char()).
+char() ->
+    fun
+        (Input) when is_integer(Input), Input >= 0, Input =< 16#10FFFF ->
+            {ok, Input};
+        (_Invalid) ->
+            {error, [not_char]}
+    end.
+
+-doc """
+Validate that input is a list of Unicode codepoints (`[char()]`),
+i.e. the old-style Erlang string representation. Element errors are
+wrapped as `{list, Index, [not_char]}`.
+""".
+-spec char_list() -> parser([char()]).
+char_list() ->
+    list(char()).
 
 -doc #{equiv => integer / 1}.
 -spec integer() -> parser(integer()).

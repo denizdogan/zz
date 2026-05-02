@@ -60,6 +60,16 @@ zz:boolean().
 %% {error, [not_boolean]} on non-boolean.
 ```
 
+### Characters and char lists
+
+```erlang
+zz:char().        %% single Unicode codepoint, integer in 0..16#10FFFF
+zz:char_list().   %% [char()] — old-style Erlang string
+```
+
+Errors: `not_char`, `not_list`. Element errors in `char_list` are
+wrapped as `{list, Index, [not_char]}` with 1-based `Index`.
+
 ### Integers
 
 ```erlang
