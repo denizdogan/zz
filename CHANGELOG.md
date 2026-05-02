@@ -49,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   function with the given arity.
 - `zz:pos_integer/0`, `zz:non_neg_integer/0`, `zz:neg_integer/0`
   validate the corresponding integer subtypes.
-- `zz:format_issues/1` formats `t:issues/0` as a human-readable
+- `zz:format_issues/1` formats `t:zz:issues/0` as a human-readable
   binary, one issue per line.
 
 ### Changed

@@ -47,7 +47,7 @@ Z = zz:map(#{
 
 ## API
 
-A parser is a `t:parser/1` — a function from input to `{ok, Value} |
+A parser is a `t:zz:parser/1` — a function from input to `{ok, Value} |
 {error, Errors}`. Run it via `zz:parse/2`.
 
 ### Any
