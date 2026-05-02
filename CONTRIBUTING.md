@@ -42,11 +42,9 @@ checks on OTP 27 and 28.
 
 ## Releasing (maintainers)
 
-```console
-$ mise check                          # all checks pass
-$ rebar3 hex build                    # validate package locally
-$ rebar3 hex publish                  # requires `rebar3 hex user auth` once
-```
-
-Bump `vsn` in `src/zz.app.src` and the `[Unreleased]` heading in
-`CHANGELOG.md` before tagging.
+1. Bump `vsn` in `src/zz.app.src` and convert the `[Unreleased]`
+   heading in `CHANGELOG.md` to the new version. Update the version
+   reference in `README.md`. Commit and push.
+2. Run `mise check` to confirm everything is green.
+3. Run `mise publish`. This publishes to Hex (requires
+   `rebar3 hex user auth` once), tags `vX.Y.Z`, and pushes the tag.

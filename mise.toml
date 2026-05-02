@@ -11,6 +11,9 @@ run = "rebar3 clean"
 [tasks.format]
 run = "rebar3 fmt"
 
+[tasks.format-check]
+run = "rebar3 fmt --check"
+
 [tasks.test]
 run = "mise eunit && mise prop"
 

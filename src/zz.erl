@@ -8,11 +8,13 @@ Each combinator returns a `t:parser/1` (or `t:optional_parser/1` from
 
 ```erlang
 Z = zz:map(#{name => zz:binary(), age => zz:integer(#{min => 0})}),
-{ok, _} = zz:parse(Z, #{name => <<"x">>, age => 1}).
+{ok, User} = zz:parse(Z, #{name => <<"x">>, age => 1}),
+<<"x">> = maps:get(name, User).
 ```
 
 On failure, the nested `t:errors/0` shape can be flattened to a
-path-addressed list of issues with `issues/1`.
+path-addressed list of issues with `issues/1`, or rendered to a
+human-readable binary with `format_issues/1`.
 """.
 
 -compile({no_auto_import, [float/1]}).
