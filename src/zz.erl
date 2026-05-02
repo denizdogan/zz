@@ -426,11 +426,11 @@ loop forever at parse time.
 tree() ->
     zz:union([
         zz:literal(leaf),
-        zz:tuple([
+        zz:tuple({
             zz:literal(node),
             zz:lazy(fun() -> tree() end),
             zz:lazy(fun() -> tree() end)
-        ])
+        })
     ]).
 ```
 """.
@@ -453,15 +453,16 @@ tuple() ->
 
 -doc """
 Validate a fixed-arity tuple where each element is parsed by the
-corresponding parser in `Zs`. Element errors are wrapped as
-`{tuple, Index, InnerErrors}` with 1-based `Index`.
+corresponding parser at the same position in `Zs`. Element errors
+are wrapped as `{tuple, Index, InnerErrors}` with 1-based `Index`.
 """.
--spec tuple([parser()]) -> parser(tuple()).
-tuple(Zs) when is_list(Zs) ->
-    Arity = length(Zs),
+-spec tuple(tuple()) -> parser(tuple()).
+tuple(Zs) when is_tuple(Zs) ->
+    Arity = tuple_size(Zs),
+    ZsList = tuple_to_list(Zs),
     fun
         (Input) when is_tuple(Input), tuple_size(Input) =:= Arity ->
-            Zip = lists:zip(Zs, tuple_to_list(Input)),
+            Zip = lists:zip(ZsList, tuple_to_list(Input)),
             {_, O1, E1} =
                 lists:foldl(
                     fun({Z, I}, {N, Os, Es}) ->

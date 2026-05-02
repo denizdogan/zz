@@ -131,7 +131,7 @@ zz:literal(<<"hello">>).
 
 ```erlang
 zz:tuple().                              %% any tuple, contents not validated
-zz:tuple([zz:integer(), zz:binary()]).     %% fixed-arity, per-position parsers
+zz:tuple({zz:integer(), zz:binary()}).     %% fixed-arity, per-position parsers
 ```
 
 Errors: `not_tuple`, `arity_mismatch`. Element errors are wrapped as
@@ -166,11 +166,11 @@ Binary tree:
 tree() ->
     zz:union([
         zz:literal(leaf),
-        zz:tuple([
+        zz:tuple({
             zz:literal(node),
             zz:lazy(fun() -> tree() end),
             zz:lazy(fun() -> tree() end)
-        ])
+        })
     ]).
 ```
 
@@ -178,10 +178,10 @@ Tree with arbitrary children — a label and a list of child nodes:
 
 ```erlang
 node_tree() ->
-    zz:tuple([
+    zz:tuple({
         zz:atom(),
         zz:list(zz:lazy(fun() -> node_tree() end))
-    ]).
+    }).
 ```
 
 ## Error format

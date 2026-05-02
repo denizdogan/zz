@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `zz:lazy/1` defers parser construction so schemas can reference
   themselves (recursive shapes like trees and JSON-like values).
 
+### Changed
+
+- `zz:tuple/1` now takes a tuple of parsers instead of a list, so the
+  schema mirrors the shape it validates: `zz:tuple({zz:integer(),
+  zz:binary()})` instead of `zz:tuple([...])`.
+
 ## [0.1.0] - 2026-05-02
 
 Initial public release.

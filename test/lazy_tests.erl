@@ -7,22 +7,22 @@
 tree() ->
     zz:union([
         zz:literal(leaf),
-        zz:tuple([
+        zz:tuple({
             zz:literal(node),
             zz:lazy(fun() -> tree() end),
             zz:lazy(fun() -> tree() end)
-        ])
+        })
     ]).
 
 %% Mutual recursion: 'a' wraps 'b' which wraps 'a' or 'a_leaf'.
 a() ->
     zz:union([
         zz:literal(a_leaf),
-        zz:tuple([zz:literal(a), zz:lazy(fun b/0)])
+        zz:tuple({zz:literal(a), zz:lazy(fun b/0)})
     ]).
 
 b() ->
-    zz:tuple([zz:literal(b), zz:lazy(fun a/0)]).
+    zz:tuple({zz:literal(b), zz:lazy(fun a/0)}).
 
 leaf_test() ->
     ?assertEqual({ok, leaf}, zz:parse(tree(), leaf)).

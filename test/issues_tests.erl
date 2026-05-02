@@ -31,7 +31,7 @@ list_path_test() ->
     ).
 
 tuple_path_test() ->
-    {error, Errs} = zz:parse(zz:tuple([zz:integer(), zz:binary()]), {foo, 1}),
+    {error, Errs} = zz:parse(zz:tuple({zz:integer(), zz:binary()}), {foo, 1}),
     ?assertEqual(
         [
             #{path => [1], code => not_integer},

@@ -120,7 +120,7 @@ prop_issues_total() ->
             {any(), zz:literal(forty_two)},
             {any(), zz:union([zz:integer(), zz:binary()])},
             {any(), zz:list(zz:integer())},
-            {any(), zz:tuple([zz:integer(), zz:binary()])},
+            {any(), zz:tuple({zz:integer(), zz:binary()})},
             {any(), zz:map(#{name => zz:binary()})},
             {any(), zz:map(#{}, #{unknown_keys => strict})}
         ]),

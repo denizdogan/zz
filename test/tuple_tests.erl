@@ -38,25 +38,25 @@ map_input_is_not_tuple_test() ->
 %%%===========================================================================
 
 empty_tuple_schema_test() ->
-    ?assertEqual({ok, {}}, zz:parse(zz:tuple([]), {})).
+    ?assertEqual({ok, {}}, zz:parse(zz:tuple({}), {})).
 
 empty_schema_arity_mismatch_test() ->
-    ?assertEqual({error, [arity_mismatch]}, zz:parse(zz:tuple([]), {1})).
+    ?assertEqual({error, [arity_mismatch]}, zz:parse(zz:tuple({}), {1})).
 
 fixed_arity_match_test() ->
-    Z = zz:tuple([zz:integer(), zz:binary()]),
+    Z = zz:tuple({zz:integer(), zz:binary()}),
     ?assertEqual({ok, {3, <<"foo">>}}, zz:parse(Z, {3, <<"foo">>})).
 
 fixed_arity_too_short_test() ->
-    Z = zz:tuple([zz:integer(), zz:binary()]),
+    Z = zz:tuple({zz:integer(), zz:binary()}),
     ?assertEqual({error, [arity_mismatch]}, zz:parse(Z, {1})).
 
 fixed_arity_too_long_test() ->
-    Z = zz:tuple([zz:integer(), zz:binary()]),
+    Z = zz:tuple({zz:integer(), zz:binary()}),
     ?assertEqual({error, [arity_mismatch]}, zz:parse(Z, {1, <<"a">>, extra})).
 
 fixed_arity_position_errors_test() ->
-    Z = zz:tuple([zz:integer(), zz:binary()]),
+    Z = zz:tuple({zz:integer(), zz:binary()}),
     ?assertEqual(
         {error, [
             {tuple, 1, [not_integer]},
@@ -66,6 +66,6 @@ fixed_arity_position_errors_test() ->
     ).
 
 fixed_arity_non_tuple_input_test() ->
-    Z = zz:tuple([zz:integer()]),
+    Z = zz:tuple({zz:integer()}),
     ?assertEqual({error, [not_tuple]}, zz:parse(Z, [1])),
     ?assertEqual({error, [not_tuple]}, zz:parse(Z, 1)).
