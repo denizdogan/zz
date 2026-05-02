@@ -35,6 +35,7 @@ path-addressed list of issues with `issues/1`.
     map/0,
     map/1,
     map/2,
+    map_of/2,
     optional/1,
     parse/2,
     tuple/0,
@@ -66,7 +67,9 @@ path-addressed list of issues with `issues/1`.
     atom()
     | {list, pos_integer(), errors()}
     | {tuple, pos_integer(), errors()}
-    | {map, term(), errors() | missing_key}
+    | {map_key, term(), errors()}
+    | {map_value, term(), errors()}
+    | {map_missing, term()}
     | {unknown_keys, [term()]}
     | {no_match, [errors()]}.
 
@@ -327,19 +330,19 @@ map(Schema, Options) ->
                                         {ok, O} ->
                                             {Os#{K => O}, Rest, Es};
                                         {error, E} ->
-                                            {Os, Rest, [{map, K, E} | Es]}
+                                            {Os, Rest, [{map_value, K, E} | Es]}
                                     end
                             end;
                         (K, Z, {Os, Is, Es}) ->
                             case maps:take(K, Is) of
                                 error ->
-                                    {Os, Is, [{map, K, missing_key} | Es]};
+                                    {Os, Is, [{map_missing, K} | Es]};
                                 {Value, Rest} ->
                                     case Z(Value) of
                                         {ok, O} ->
                                             {Os#{K => O}, Rest, Es};
                                         {error, E} ->
-                                            {Os, Rest, [{map, K, E} | Es]}
+                                            {Os, Rest, [{map_value, K, E} | Es]}
                                     end
                             end
                     end,
@@ -362,6 +365,48 @@ map(Schema, Options) ->
                     {ok, Output2};
                 _ ->
                     {error, lists:reverse(Errors2)}
+            end;
+        (_Invalid) ->
+            {error, [not_map]}
+    end.
+
+-doc """
+Validate a homogeneous map where every key is parsed by `KZ` and every
+value by `VZ`. Use this for caches, dictionaries, and other arbitrary-
+keyed maps where the key shape is uniform.
+
+Key errors are wrapped as `{map_key, OriginalKey, InnerErrors}`; value
+errors are wrapped as `{map_value, OriginalKey, InnerErrors}`.
+
+```erlang
+zz:map_of(zz:binary(), zz:integer()).
+```
+""".
+-spec map_of(parser(K), parser(V)) -> parser(#{K => V}).
+map_of(KZ, VZ) ->
+    fun
+        (Input) when is_map(Input) ->
+            {Out, Errs} =
+                maps:fold(
+                    fun(K, V, {Os, Es}) ->
+                        case KZ(K) of
+                            {ok, K2} ->
+                                case VZ(V) of
+                                    {ok, V2} ->
+                                        {Os#{K2 => V2}, Es};
+                                    {error, E} ->
+                                        {Os, [{map_value, K, E} | Es]}
+                                end;
+                            {error, E} ->
+                                {Os, [{map_key, K, E} | Es]}
+                        end
+                    end,
+                    {#{}, []},
+                    Input
+                ),
+            case Errs of
+                [] -> {ok, Out};
+                _ -> {error, lists:reverse(Errs)}
             end;
         (_Invalid) ->
             {error, [not_map]}
@@ -477,6 +522,8 @@ Compound errors carry extra fields:
 - `unknown_keys` issues include `keys => [term()]`.
 - `no_match` issues include `branches => [issues()]`, one per union
   branch in input order.
+- `invalid_key` issues (from `map_of/2` key validation) include
+  `key => term()` (the offending key) and `errors => issues()`.
 """.
 -spec issues(errors()) -> issues().
 issues(Errors) ->
@@ -495,10 +542,19 @@ issue({list, N, Es}, RevPath) ->
     issues_at(Es, [N | RevPath]);
 issue({tuple, N, Es}, RevPath) ->
     issues_at(Es, [N | RevPath]);
-issue({map, K, missing_key}, RevPath) ->
+issue({map_missing, K}, RevPath) ->
     [#{path => lists:reverse([K | RevPath]), code => missing_key}];
-issue({map, K, Es}, RevPath) when is_list(Es) ->
+issue({map_value, K, Es}, RevPath) ->
     issues_at(Es, [K | RevPath]);
+issue({map_key, K, Es}, RevPath) ->
+    [
+        #{
+            path => lists:reverse(RevPath),
+            code => invalid_key,
+            key => K,
+            errors => issues(Es)
+        }
+    ];
 issue({unknown_keys, Keys}, RevPath) ->
     [#{path => lists:reverse(RevPath), code => unknown_keys, keys => Keys}];
 issue({no_match, Branches}, RevPath) ->

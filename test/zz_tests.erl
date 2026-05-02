@@ -59,18 +59,18 @@ map_with_boolean_value_ok_test() ->
 
 map_with_boolean_value_error_test() ->
     Z = zz:map(#{foo => zz:boolean()}),
-    ?assertEqual({error, [{map, foo, [not_boolean]}]}, Z(#{foo => 123})).
+    ?assertEqual({error, [{map_value, foo, [not_boolean]}]}, Z(#{foo => 123})).
 
 list_of_map_value_error_test() ->
     Z = zz:list(zz:map(#{foo => zz:boolean()})),
-    ?assertEqual({error, [{list, 1, [{map, foo, [not_boolean]}]}]}, Z([#{foo => 123}])).
+    ?assertEqual({error, [{list, 1, [{map_value, foo, [not_boolean]}]}]}, Z([#{foo => 123}])).
 
 list_of_map_mixed_errors_test() ->
     Z = zz:list(zz:map(#{foo => zz:boolean()})),
     ?assertEqual(
         {error, [
-            {list, 1, [{map, foo, [not_boolean]}]},
-            {list, 4, [{map, foo, missing_key}]}
+            {list, 1, [{map_value, foo, [not_boolean]}]},
+            {list, 4, [{map_missing, foo}]}
         ]},
         Z([#{foo => 123}, #{foo => true}, #{foo => false}, #{bar => true}])
     ).
@@ -89,7 +89,7 @@ optional_present_valid_test() ->
 
 optional_present_invalid_test() ->
     Z = zz:map(#{foo => zz:optional(zz:binary(#{}))}),
-    ?assertEqual({error, [{map, foo, [not_binary]}]}, Z(#{foo => 123})).
+    ?assertEqual({error, [{map_value, foo, [not_binary]}]}, Z(#{foo => 123})).
 
 optional_input_not_map_test() ->
     Z = zz:map(#{foo => zz:optional(zz:binary(#{}))}),
@@ -113,7 +113,7 @@ deeply_nested_valid_test() ->
 deeply_nested_leaf_error_test() ->
     Z = deep_schema(),
     ?assertEqual(
-        {error, [{list, 1, [{map, a, [{list, 1, [{map, b, [not_boolean]}]}]}]}]},
+        {error, [{list, 1, [{map_value, a, [{list, 1, [{map_value, b, [not_boolean]}]}]}]}]},
         Z([#{a => [#{b => 1}]}])
     ).
 
@@ -123,9 +123,9 @@ deeply_nested_multi_position_errors_test() ->
         {error, [
             {list, 1, [not_map]},
             {list, 2, [not_map]},
-            {list, 3, [{map, a, [{list, 1, [{map, b, missing_key}]}]}]},
-            {list, 4, [{map, a, missing_key}]},
-            {list, 5, [{map, a, missing_key}]}
+            {list, 3, [{map_value, a, [{list, 1, [{map_missing, b}]}]}]},
+            {list, 4, [{map_missing, a}]},
+            {list, 5, [{map_missing, a}]}
         ]},
         Z([
             true,

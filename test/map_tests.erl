@@ -42,7 +42,7 @@ unknown_keys_passthrough_test() ->
 
 schema_value_mismatch_test() ->
     ?assertEqual(
-        {error, [{map, foo, [not_literal]}]},
+        {error, [{map_value, foo, [not_literal]}]},
         zz:parse(zz:map(#{foo => zz:literal(2)}), #{foo => 1})
     ).
 
@@ -53,21 +53,21 @@ optional_present_and_valid_test() ->
 optional_present_required_invalid_test() ->
     Z = schema_foo_bar(),
     ?assertEqual(
-        {error, [{map, foo, [not_literal]}]},
+        {error, [{map_value, foo, [not_literal]}]},
         zz:parse(Z, #{foo => 1, bar => bar})
     ).
 
 optional_absent_required_invalid_test() ->
     Z = schema_foo_bar(),
     ?assertEqual(
-        {error, [{map, foo, [not_literal]}]},
+        {error, [{map_value, foo, [not_literal]}]},
         zz:parse(Z, #{foo => 1})
     ).
 
 optional_present_invalid_test() ->
     Z = schema_foo_bar(),
     ?assertEqual(
-        {error, [{map, bar, [not_literal]}]},
+        {error, [{map_value, bar, [not_literal]}]},
         zz:parse(Z, #{foo => 2, bar => qux})
     ).
 
@@ -75,7 +75,7 @@ strict_combines_missing_and_unknown_test() ->
     Z = zz:map(#{foo => zz:integer()}, #{unknown_keys => strict}),
     ?assertEqual(
         {error, [
-            {map, foo, missing_key},
+            {map_missing, foo},
             {unknown_keys, [bar]}
         ]},
         zz:parse(Z, #{bar => 1})

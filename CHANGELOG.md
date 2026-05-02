@@ -21,12 +21,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `optional_parser(term())` aliases for back-compat.
 - `zz:lazy/1` defers parser construction so schemas can reference
   themselves (recursive shapes like trees and JSON-like values).
+- `zz:map_of/2` validates a homogeneous map: every key parsed by the
+  first parser, every value by the second. Key errors surface as
+  `{map_key, OriginalKey, InnerErrors}`; value errors as
+  `{map_value, OriginalKey, InnerErrors}`. `zz:issues/1` flattens
+  key errors as `code => invalid_key` issues with `key` and `errors`
+  fields.
 
 ### Changed
 
 - `zz:tuple/1` now takes a tuple of parsers instead of a list, so the
   schema mirrors the shape it validates: `zz:tuple({zz:integer(),
   zz:binary()})` instead of `zz:tuple([...])`.
+- Map errors are now tagged symmetrically: `{map_value, K, [errs]}`
+  for value-parser failures (was `{map, K, [errs]}`) and
+  `{map_missing, K}` for required-key absences (was `{map, K,
+  missing_key}`). Pattern matches on the old shapes need to update.
 
 ### Removed
 

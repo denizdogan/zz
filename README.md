@@ -114,8 +114,18 @@ zz:map(#{
 - `passthrough` (default for `map/0`) — keep unknown keys in output.
 - `strict` — emit `{unknown_keys, [Key]}` error.
 
-Errors: `not_map`, `{map, Key, missing_key}`, `{map, Key, InnerErrors}`,
+Errors: `not_map`, `{map_missing, Key}`, `{map_value, Key, InnerErrors}`,
 `{unknown_keys, [Key]}`.
+
+For arbitrary-keyed homogeneous maps, use `zz:map_of(KeyParser,
+ValueParser)`:
+
+```erlang
+zz:map_of(zz:binary(), zz:integer()).
+```
+
+Key errors are wrapped as `{map_key, OriginalKey, InnerErrors}`; value
+errors as `{map_value, OriginalKey, InnerErrors}`.
 
 ### Literals
 
@@ -191,8 +201,9 @@ nested structure:
 ```erlang
 {list, Index, InnerErrors}
 {tuple, Index, InnerErrors}
-{map, Key, InnerErrors}
-{map, Key, missing_key}
+{map_value, Key, InnerErrors}
+{map_key, Key, InnerErrors}
+{map_missing, Key}
 {unknown_keys, [Key]}
 {no_match, [Errors1, Errors2, ...]}
 ```
@@ -206,8 +217,8 @@ Z = zz:map(#{
 }),
 zz:parse(Z, #{name => 1, friends => [#{age => -1}]}).
 %% {error, [
-%%     {map, name, [not_binary]},
-%%     {map, friends, [{list, 1, [{map, age, [integer_too_small]}]}]}
+%%     {map_value, name, [not_binary]},
+%%     {map_value, friends, [{list, 1, [{map_value, age, [integer_too_small]}]}]}
 %% ]}
 ```
 
