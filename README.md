@@ -4,11 +4,15 @@
 [![codecov](https://codecov.io/gh/denizdogan/zz/branch/main/graph/badge.svg)](https://codecov.io/gh/denizdogan/zz)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE.md)
 
-Zod-like parsing and validation for Erlang.
+[Zod](https://zod.dev/)-like parsing and validation for Erlang.
 
 `zz` provides composable parser combinators that validate runtime data
 against a schema and return either `{ok, Output}` or `{error, Errors}`
 with structured error paths.
+
+The name and the API are directly inspired by Zod. It would have been
+just `z`, but Hex requires package names to be at least two characters
+long.
 
 ## Installation
 
