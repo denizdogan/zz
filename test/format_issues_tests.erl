@@ -43,6 +43,13 @@ with_extras_test() ->
         Result
     ).
 
+unusual_path_segment_test() ->
+    %% Path segments are arbitrary terms (map keys can be anything).
+    %% Tuple/float/list segments fall through to the io_lib:format clause.
+    Issues = [#{path => [{a, b}], code => not_integer}],
+    Output = zz:format_issues(Issues),
+    true = binary:match(Output, <<"{a,b}: not_integer">>) =/= nomatch.
+
 end_to_end_via_issues_test() ->
     Z = zz:map(#{
         name => zz:binary(),
