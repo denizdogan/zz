@@ -10,22 +10,12 @@ Zod-like parsing and validation for Erlang.
 against a schema and return either `{ok, Output}` or `{error, Errors}`
 with structured error paths.
 
-> **Status:** pre-release. The API is still in flux and the package has
-> not yet been published to Hex. The installation snippet below assumes a
-> future release; until then, depend on the git source directly.
-
 ## Installation
 
-Once published:
+Add to `rebar.config`:
 
 ```erlang
 {deps, [{z, "0.1.0"}]}.
-```
-
-In the meantime:
-
-```erlang
-{deps, [{z, {git, "https://github.com/denizdogan/z.git", {branch, "main"}}}]}.
 ```
 
 ## Quick start
