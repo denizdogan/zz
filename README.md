@@ -85,12 +85,10 @@ not accepted — use `zz:union([zz:integer(), zz:float()])` for either.
 zz:list().                         %% any list, contents not validated
 zz:list(zz:integer()).              %% homogeneous list
 zz:list(zz:integer(), #{min => 1, max => 10}).
-zz:list([zz:integer(), zz:binary()]).%% fixed-length, per-position parsers
 ```
 
-Errors: `not_list`, `list_too_short`, `list_too_long`, `length_mismatch`
-(fixed-length form). Element errors are wrapped as
-`{list, Index, InnerErrors}` with 1-based `Index`.
+Errors: `not_list`, `list_too_short`, `list_too_long`. Element errors
+are wrapped as `{list, Index, InnerErrors}` with 1-based `Index`.
 
 ### Maps
 

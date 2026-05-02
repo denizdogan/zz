@@ -240,45 +240,8 @@ list() ->
             {error, [not_list]}
     end.
 
--doc """
-With a list of parsers, validate a fixed-length tuple-like list where each
-element is parsed by the corresponding parser.
-
-With a single parser, validate a homogeneous list (equivalent to
-`list(Z, #{})`).
-""".
--spec list
-    (parser(T)) -> parser([T]);
-    ([parser()]) -> parser([term()]).
-list(Zs) when is_list(Zs) ->
-    Length = length(Zs),
-    fun
-        (Input) when is_list(Input), length(Input) =:= Length ->
-            Zip = lists:zip(Zs, Input),
-            {_, O1, E1} =
-                lists:foldl(
-                    fun({Z, I}, {N, Os, Es}) ->
-                        case Z(I) of
-                            {ok, O} ->
-                                {N + 1, [O | Os], Es};
-                            {error, E} ->
-                                {N + 1, Os, [{list, N, E} | Es]}
-                        end
-                    end,
-                    {1, [], []},
-                    Zip
-                ),
-            case E1 of
-                [] ->
-                    {ok, lists:reverse(O1)};
-                _ ->
-                    {error, lists:reverse(E1)}
-            end;
-        (Input) when is_list(Input) ->
-            {error, [length_mismatch]};
-        (_Invalid) ->
-            {error, [not_list]}
-    end;
+-doc "Validate a homogeneous list (equivalent to `list(Z, #{})`).".
+-spec list(parser(T)) -> parser([T]).
 list(Z) ->
     list(Z, #{}).
 

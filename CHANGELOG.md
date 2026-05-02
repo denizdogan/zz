@@ -28,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   schema mirrors the shape it validates: `zz:tuple({zz:integer(),
   zz:binary()})` instead of `zz:tuple([...])`.
 
+### Removed
+
+- `zz:list/1` no longer accepts a list of parsers (the heterogeneous
+  fixed-length form). Use `zz:tuple/1` for fixed-length heterogeneous
+  data. The `length_mismatch` error code is gone.
+
 ## [0.1.0] - 2026-05-02
 
 Initial public release.

@@ -38,37 +38,6 @@ homogeneous_element_errors_test() ->
     ).
 
 %%%===========================================================================
-%%% list/1 — fixed-length, per-position parsers
-%%%===========================================================================
-
-fixed_length_non_list_input_test() ->
-    ?assertEqual({error, [not_list]}, zz:parse(zz:list([]), {})).
-
-fixed_length_empty_match_test() ->
-    ?assertEqual({ok, []}, zz:parse(zz:list([]), [])).
-
-fixed_length_too_short_test() ->
-    ?assertEqual(
-        {error, [length_mismatch]},
-        zz:parse(zz:list([zz:integer()]), [])
-    ).
-
-fixed_length_match_test() ->
-    ?assertEqual(
-        {ok, [3, <<"foo">>]},
-        zz:parse(zz:list([zz:integer(), zz:binary()]), [3, <<"foo">>])
-    ).
-
-fixed_length_position_errors_test() ->
-    ?assertEqual(
-        {error, [
-            {list, 1, [not_integer]},
-            {list, 2, [not_binary]}
-        ]},
-        zz:parse(zz:list([zz:integer(), zz:binary()]), [<<"three">>, foo])
-    ).
-
-%%%===========================================================================
 %%% list/2 — homogeneous with min/max length options
 %%%===========================================================================
 
