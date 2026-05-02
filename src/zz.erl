@@ -154,35 +154,35 @@ Validate that input is a binary, with optional `min`/`max` byte size and
 """.
 -spec binary(binary_options()) -> parser(binary()).
 binary(Options) ->
+    Min = maps:get(min, Options, undefined),
+    Max = maps:get(max, Options, undefined),
+    Regex = maps:get(regex, Options, undefined),
     fun
         (Input) when is_binary(Input) ->
-            Errors =
-                maps:fold(
-                    fun
-                        (min, Min, Es) when byte_size(Input) < Min ->
-                            [binary_too_short | Es];
-                        (min, _Min, Es) ->
-                            Es;
-                        (max, Max, Es) when byte_size(Input) > Max ->
-                            [binary_too_long | Es];
-                        (max, _Max, Es) ->
-                            Es;
-                        (regex, Regex, Es) when is_binary(Regex); is_list(Regex) ->
-                            case re:run(Input, Regex) of
-                                nomatch ->
-                                    [regex_mismatch | Es];
-                                _ ->
-                                    Es
-                            end
-                    end,
-                    [],
-                    Options
-                ),
-            case Errors of
-                [] ->
-                    {ok, Input};
-                _ ->
-                    {error, Errors}
+            Sz = byte_size(Input),
+            Errs0 =
+                if
+                    is_integer(Min), Sz < Min -> [binary_too_short];
+                    true -> []
+                end,
+            Errs1 =
+                if
+                    is_integer(Max), Sz > Max -> [binary_too_long | Errs0];
+                    true -> Errs0
+                end,
+            Errs2 =
+                case Regex of
+                    undefined ->
+                        Errs1;
+                    _ ->
+                        case re:run(Input, Regex) of
+                            nomatch -> [regex_mismatch | Errs1];
+                            _ -> Errs1
+                        end
+                end,
+            case Errs2 of
+                [] -> {ok, Input};
+                _ -> {error, Errs2}
             end;
         (_Invalid) ->
             {error, [not_binary]}
@@ -199,26 +199,24 @@ Validate that input is a bitstring, with optional `min`/`max`
 """.
 -spec bitstring(bitstring_options()) -> parser(bitstring()).
 bitstring(Options) ->
+    Min = maps:get(min, Options, undefined),
+    Max = maps:get(max, Options, undefined),
     fun
         (Input) when is_bitstring(Input) ->
-            Errors =
-                maps:fold(
-                    fun
-                        (min, Min, Es) when bit_size(Input) < Min ->
-                            [bitstring_too_short | Es];
-                        (min, _Min, Es) ->
-                            Es;
-                        (max, Max, Es) when bit_size(Input) > Max ->
-                            [bitstring_too_long | Es];
-                        (max, _Max, Es) ->
-                            Es
-                    end,
-                    [],
-                    Options
-                ),
-            case Errors of
+            Sz = bit_size(Input),
+            Errs0 =
+                if
+                    is_integer(Min), Sz < Min -> [bitstring_too_short];
+                    true -> []
+                end,
+            Errs1 =
+                if
+                    is_integer(Max), Sz > Max -> [bitstring_too_long | Errs0];
+                    true -> Errs0
+                end,
+            case Errs1 of
                 [] -> {ok, Input};
-                _ -> {error, Errors}
+                _ -> {error, Errs1}
             end;
         (_Invalid) ->
             {error, [not_bitstring]}
@@ -317,28 +315,23 @@ integer() ->
 -doc "Validate that input is an integer, with optional `min`/`max`.".
 -spec integer(integer_options()) -> parser(integer()).
 integer(Options) ->
+    Min = maps:get(min, Options, undefined),
+    Max = maps:get(max, Options, undefined),
     fun
         (Input) when is_integer(Input) ->
-            Errors =
-                maps:fold(
-                    fun
-                        (min, Min, Es) when Input < Min ->
-                            [integer_too_small | Es];
-                        (min, _Min, Es) ->
-                            Es;
-                        (max, Max, Es) when Input > Max ->
-                            [integer_too_large | Es];
-                        (max, _Max, Es) ->
-                            Es
-                    end,
-                    [],
-                    Options
-                ),
-            case Errors of
-                [] ->
-                    {ok, Input};
-                _ ->
-                    {error, Errors}
+            Errs0 =
+                if
+                    is_integer(Min), Input < Min -> [integer_too_small];
+                    true -> []
+                end,
+            Errs1 =
+                if
+                    is_integer(Max), Input > Max -> [integer_too_large | Errs0];
+                    true -> Errs0
+                end,
+            case Errs1 of
+                [] -> {ok, Input};
+                _ -> {error, Errs1}
             end;
         (_Invalid) ->
             {error, [not_integer]}
@@ -382,28 +375,23 @@ float() ->
 -doc "Validate that input is a float, with optional `min`/`max`.".
 -spec float(float_options()) -> parser(float()).
 float(Options) ->
+    Min = maps:get(min, Options, undefined),
+    Max = maps:get(max, Options, undefined),
     fun
         (Input) when is_float(Input) ->
-            Errors =
-                maps:fold(
-                    fun
-                        (min, Min, Es) when Input < Min ->
-                            [float_too_small | Es];
-                        (min, _Min, Es) ->
-                            Es;
-                        (max, Max, Es) when Input > Max ->
-                            [float_too_large | Es];
-                        (max, _Max, Es) ->
-                            Es
-                    end,
-                    [],
-                    Options
-                ),
-            case Errors of
-                [] ->
-                    {ok, Input};
-                _ ->
-                    {error, Errors}
+            Errs0 =
+                if
+                    is_float(Min), Input < Min -> [float_too_small];
+                    true -> []
+                end,
+            Errs1 =
+                if
+                    is_float(Max), Input > Max -> [float_too_large | Errs0];
+                    true -> Errs0
+                end,
+            case Errs1 of
+                [] -> {ok, Input};
+                _ -> {error, Errs1}
             end;
         (_Invalid) ->
             {error, [not_float]}
@@ -462,35 +450,33 @@ Validate a homogeneous list, parsing each element with `Z`. Optional
 """.
 -spec list(parser(T), list_options()) -> parser([T]).
 list(Z, Options) ->
+    Min = maps:get(min, Options, undefined),
+    Max = maps:get(max, Options, undefined),
     fun
         (Input) when is_list(Input) ->
-            case maps:get(max, Options, infinity) of
-                Max when is_integer(Max), length(Input) > Max ->
+            Len = length(Input),
+            if
+                is_integer(Max), Len > Max ->
                     {error, [list_too_long]};
-                _ ->
-                    case maps:get(min, Options, 0) of
-                        Min when is_integer(Min), length(Input) < Min ->
-                            {error, [list_too_short]};
-                        _ ->
-                            {_, O1, E1} =
-                                lists:foldl(
-                                    fun(I, {N, Os, Es}) ->
-                                        case Z(I) of
-                                            {ok, O} ->
-                                                {N + 1, [O | Os], Es};
-                                            {error, E} ->
-                                                {N + 1, Os, [{list, N, E} | Es]}
-                                        end
-                                    end,
-                                    {1, [], []},
-                                    Input
-                                ),
-                            case E1 of
-                                [] ->
-                                    {ok, lists:reverse(O1)};
-                                _ ->
-                                    {error, lists:reverse(E1)}
-                            end
+                is_integer(Min), Len < Min ->
+                    {error, [list_too_short]};
+                true ->
+                    {_, O1, E1} =
+                        lists:foldl(
+                            fun(I, {N, Os, Es}) ->
+                                case Z(I) of
+                                    {ok, O} ->
+                                        {N + 1, [O | Os], Es};
+                                    {error, E} ->
+                                        {N + 1, Os, [{list, N, E} | Es]}
+                                end
+                            end,
+                            {1, [], []},
+                            Input
+                        ),
+                    case E1 of
+                        [] -> {ok, lists:reverse(O1)};
+                        _ -> {error, lists:reverse(E1)}
                     end
             end;
         (_Invalid) ->
@@ -510,7 +496,12 @@ literal(Value) ->
 -doc "Validate that input is a map (passthrough on contents).".
 -spec map() -> parser(#{term() => term()}).
 map() ->
-    map(#{}, #{unknown_keys => passthrough}).
+    fun
+        (Input) when is_map(Input) ->
+            {ok, Input};
+        (_Invalid) ->
+            {error, [not_map]}
+    end.
 
 -doc #{equiv => map / 2}.
 -spec map(schema()) -> parser(#{term() => term()}).
@@ -524,6 +515,7 @@ not in `Schema`: `strip` (drop, default), `passthrough` (keep), `strict`
 """.
 -spec map(schema(), map_options()) -> parser(#{term() => term()}).
 map(Schema, Options) ->
+    Mode = maps:get(unknown_keys, Options, strip),
     fun
         (Input) when is_map(Input) ->
             {Output1, RemainingMap, Errors1} =
@@ -559,7 +551,7 @@ map(Schema, Options) ->
                 ),
 
             {Output2, Errors2} =
-                case maps:get(unknown_keys, Options, strip) of
+                case Mode of
                     strip ->
                         {Output1, Errors1};
                     passthrough ->

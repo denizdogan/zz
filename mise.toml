@@ -63,6 +63,16 @@ run = "elp eqwalize-all"
 [tasks.erl]
 run = "rebar3 shell"
 
+[tasks.bench]
+description = "Run the zz_bench micro-benchmarks"
+run = """
+rebar3 as test compile
+erl -noshell -noinput \\
+    -pa _build/test/lib/zz/ebin \\
+    -pa _build/test/lib/zz/test \\
+    -eval "zz_bench:run(), halt()."
+"""
+
 [tasks.cover]
 run = """
 rebar3 as test do eunit --cover --cover_export_name=suite1
