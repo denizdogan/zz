@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `zz:char/0` validates a single Unicode codepoint (integer in
   `0..16#10FFFF`). `zz:char_list/0` validates a `[char()]`, the
   old-style Erlang string representation.
+- `zz:pid/0` validates a process identifier. `zz:reference/0`
+  validates a reference (e.g. from `make_ref/0`).
 
 ### Changed
 

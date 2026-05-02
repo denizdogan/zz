@@ -40,6 +40,8 @@ path-addressed list of issues with `issues/1`.
     map_of/2,
     optional/1,
     parse/2,
+    pid/0,
+    reference/0,
     tuple/0,
     tuple/1,
     union/1
@@ -186,6 +188,26 @@ wrapped as `{list, Index, [not_char]}`.
 -spec char_list() -> parser([char()]).
 char_list() ->
     list(char()).
+
+-doc "Validate that input is a process identifier.".
+-spec pid() -> parser(pid()).
+pid() ->
+    fun
+        (Input) when is_pid(Input) ->
+            {ok, Input};
+        (_Invalid) ->
+            {error, [not_pid]}
+    end.
+
+-doc "Validate that input is a reference (e.g. from `make_ref/0`).".
+-spec reference() -> parser(reference()).
+reference() ->
+    fun
+        (Input) when is_reference(Input) ->
+            {ok, Input};
+        (_Invalid) ->
+            {error, [not_reference]}
+    end.
 
 -doc #{equiv => integer / 1}.
 -spec integer() -> parser(integer()).

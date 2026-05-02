@@ -167,6 +167,13 @@ If no branch matches, the error is
 errors list from the corresponding parser, in input order. Empty union
 yields `{error, [{no_match, []}]}`.
 
+### Pids and references
+
+```erlang
+zz:pid().         %% {error, [not_pid]} on non-pid
+zz:reference().   %% {error, [not_reference]} on non-reference
+```
+
 ### Optional
 
 `zz:optional(Parser)` wraps a parser for use as a map schema value. Has no
