@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   old-style Erlang string representation.
 - `zz:pid/0` validates a process identifier. `zz:reference/0`
   validates a reference (e.g. from `make_ref/0`).
+- `zz:iodata/0` validates `iodata()` (a binary or `iolist()`).
+  `zz:iolist/0` validates an `iolist()` only (binary input rejected).
+- `zz:number/0` validates an integer or float.
+- `zz:enum/1` validates that input equals (`=:=`) one of a list of
+  values; fails with `not_in_enum`.
 
 ### Changed
 

@@ -17,6 +17,14 @@ path-addressed list of issues with `issues/1`.
 
 -compile({no_auto_import, [float/1]}).
 
+%% iodata/0 and iolist/0 narrow input from term() to iodata/iolist via
+%% try iolist_size(...) — eqwalizer can't reason about that flow, so
+%% it would reject the precise specs. The runtime check is the
+%% validation; we keep the precise return type and skip static checking
+%% for these two functions only.
+-eqwalizer({nowarn_function, iodata/0}).
+-eqwalizer({nowarn_function, iolist/0}).
+
 -export([
     atom/0,
     binary/0,
@@ -24,10 +32,13 @@ path-addressed list of issues with `issues/1`.
     boolean/0,
     char/0,
     char_list/0,
+    enum/1,
     float/0,
     float/1,
     integer/0,
     integer/1,
+    iodata/0,
+    iolist/0,
     issues/1,
     lazy/1,
     list/0,
@@ -38,6 +49,7 @@ path-addressed list of issues with `issues/1`.
     map/1,
     map/2,
     map_of/2,
+    number/0,
     optional/1,
     parse/2,
     pid/0,
@@ -155,6 +167,39 @@ binary(Options) ->
             end;
         (_Invalid) ->
             {error, [not_binary]}
+    end.
+
+-doc """
+Validate that input is `iodata()` (a binary or `iolist()`). Validation
+walks the entire structure via `iolist_size/1`, so cost is linear in
+the total bytes addressed.
+""".
+-spec iodata() -> parser(iodata()).
+iodata() ->
+    fun(Input) ->
+        try iolist_size(Input) of
+            _ -> {ok, Input}
+        catch
+            error:badarg -> {error, [not_iodata]}
+        end
+    end.
+
+-doc """
+Validate that input is an `iolist()` (a possibly-improper list of
+bytes, binaries, and nested iolists). Use `iodata/0` if a raw binary
+should also be accepted.
+""".
+-spec iolist() -> parser(iolist()).
+iolist() ->
+    fun
+        (Input) when is_list(Input) ->
+            try iolist_size(Input) of
+                _ -> {ok, Input}
+            catch
+                error:badarg -> {error, [not_iolist]}
+            end;
+        (_Invalid) ->
+            {error, [not_iolist]}
     end.
 
 -doc "Validate that input is a boolean.".
@@ -277,6 +322,16 @@ float(Options) ->
             end;
         (_Invalid) ->
             {error, [not_float]}
+    end.
+
+-doc "Validate that input is a number (integer or float).".
+-spec number() -> parser(number()).
+number() ->
+    fun
+        (Input) when is_number(Input) ->
+            {ok, Input};
+        (_Invalid) ->
+            {error, [not_number]}
     end.
 
 -doc "Validate that input is a list (any contents).".
@@ -551,6 +606,22 @@ yields `{error, [{no_match, []}]}`.
 -spec union([parser(T)]) -> parser(T).
 union(Zs) ->
     fun(Input) -> union_try(Zs, Input, []) end.
+
+-doc """
+Validate that input equals (`=:=`) one of `Values`. Fails with
+`not_in_enum` if no value matches. Equivalent to a `union/1` of
+`literal/1`s but with a flat error code.
+""".
+-spec enum([T]) -> parser(T).
+enum(Values) ->
+    fun(Input) -> enum_match(Input, Values) end.
+
+enum_match(_, []) ->
+    {error, [not_in_enum]};
+enum_match(Input, [V | _]) when Input =:= V ->
+    {ok, V};
+enum_match(Input, [_ | Rest]) ->
+    enum_match(Input, Rest).
 
 union_try([], _Input, Errs) ->
     {error, [{no_match, lists:reverse(Errs)}]};

@@ -87,7 +87,23 @@ zz:float(#{min => N, max => N}).
 ```
 
 Errors: `not_float`, `float_too_small`, `float_too_large`. Integers are
-not accepted — use `zz:union([zz:integer(), zz:float()])` for either.
+not accepted — use `zz:number()` for either.
+
+### Numbers
+
+```erlang
+zz:number().      %% integer or float
+%% {error, [not_number]} otherwise.
+```
+
+### Iodata and iolists
+
+```erlang
+zz:iodata().      %% binary or iolist
+zz:iolist().      %% iolist only (binary input rejected)
+```
+
+Errors: `not_iodata`, `not_iolist`.
 
 ### Lists
 
@@ -166,6 +182,16 @@ If no branch matches, the error is
 `{error, [{no_match, [Errors1, Errors2, ...]}]}` where each entry is the
 errors list from the corresponding parser, in input order. Empty union
 yields `{error, [{no_match, []}]}`.
+
+### Enums
+
+```erlang
+zz:enum([red, green, blue]).
+%% {error, [not_in_enum]} on any value not in the list.
+```
+
+Sugar for "input must be `=:=` one of these values". Equivalent to a
+union of `literal/1`s but with a flat error code.
 
 ### Pids and references
 
