@@ -31,7 +31,18 @@ Z = zz:map(#{
     tags => zz:list(zz:atom())
 }),
 
-{ok, _} = zz:parse(Z, #{name => <<"alice">>, age => 30, tags => [admin]}).
+%% Valid input -> {ok, ParsedMap}.
+{ok, User} = zz:parse(Z, #{name => <<"alice">>, age => 30, tags => [admin]}),
+<<"alice">> = maps:get(name, User),
+30 = maps:get(age, User),
+[admin] = maps:get(tags, User),
+
+%% Invalid input -> {error, Errors}.
+{error, _Errs} = zz:parse(Z, #{name => 1, age => -1, tags => [admin]}).
+%% Errs = [
+%%     {map_value, name, [not_binary]},
+%%     {map_value, age,  [integer_too_small]}
+%% ]
 ```
 
 ## API
@@ -288,6 +299,14 @@ zz:issues(Errs).
 ```
 
 Useful for JSON serialization, logging, etc.
+
+> **Note:** Issue order for `map/1,2` and `map_of/2` follows the
+> underlying map iteration order. Erlang does not guarantee a map
+> iteration order across OTP releases — the observable order has
+> changed as internal representations evolved, and `maps:keys/1` and
+> friends explicitly document the order as undefined. zz targets OTP
+> 27+; treat the order as undefined and sort by `path` if you need
+> deterministic output.
 
 ## Development
 
