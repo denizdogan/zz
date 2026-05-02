@@ -39,6 +39,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   values; fails with `not_in_enum`.
 - `zz:nullable/1` accepts `undefined` alongside the wrapped parser's
   values. Sugar for `union([literal(undefined), Z])`.
+- `zz:any/0` accepts any input, output equals input. Useful as a
+  placeholder.
+- `zz:bitstring/0,1` validates a bitstring, with optional `min`/`max`
+  `bit_size/1` constraints.
+- `zz:function/0` validates any function. `zz:function/1` validates a
+  function with the given arity.
+- `zz:pos_integer/0`, `zz:non_neg_integer/0`, `zz:neg_integer/0`
+  validate the corresponding integer subtypes.
+- `zz:format_issues/1` formats `t:issues/0` as a human-readable
+  binary, one issue per line.
 
 ### Changed
 

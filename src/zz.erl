@@ -26,15 +26,21 @@ path-addressed list of issues with `issues/1`.
 -eqwalizer({nowarn_function, iolist/0}).
 
 -export([
+    any/0,
     atom/0,
     binary/0,
     binary/1,
+    bitstring/0,
+    bitstring/1,
     boolean/0,
     char/0,
     char_list/0,
     enum/1,
     float/0,
     float/1,
+    format_issues/1,
+    function/0,
+    function/1,
     integer/0,
     integer/1,
     iodata/0,
@@ -49,11 +55,14 @@ path-addressed list of issues with `issues/1`.
     map/1,
     map/2,
     map_of/2,
+    neg_integer/0,
+    non_neg_integer/0,
     nullable/1,
     number/0,
     optional/1,
     parse/2,
     pid/0,
+    pos_integer/0,
     reference/0,
     tuple/0,
     tuple/1,
@@ -71,6 +80,7 @@ path-addressed list of issues with `issues/1`.
     issues/0,
     path/0,
     binary_options/0,
+    bitstring_options/0,
     integer_options/0,
     float_options/0,
     list_options/0,
@@ -104,6 +114,7 @@ path-addressed list of issues with `issues/1`.
     max => non_neg_integer(),
     regex => iodata()
 }.
+-type bitstring_options() :: #{min => non_neg_integer(), max => non_neg_integer()}.
 -type integer_options() :: #{min => integer(), max => integer()}.
 -type float_options() :: #{min => float(), max => float()}.
 -type list_options() :: #{min => non_neg_integer(), max => non_neg_integer()}.
@@ -114,6 +125,11 @@ path-addressed list of issues with `issues/1`.
 -spec parse(parser(T), term()) -> result(T).
 parse(Z, Input) ->
     Z(Input).
+
+-doc "Accept any input. Output equals input.".
+-spec any() -> parser(term()).
+any() ->
+    fun(Input) -> {ok, Input} end.
 
 -doc "Validate that input is an atom.".
 -spec atom() -> parser(atom()).
@@ -168,6 +184,42 @@ binary(Options) ->
             end;
         (_Invalid) ->
             {error, [not_binary]}
+    end.
+
+-doc #{equiv => bitstring / 1}.
+-spec bitstring() -> parser(bitstring()).
+bitstring() ->
+    bitstring(#{}).
+
+-doc """
+Validate that input is a bitstring, with optional `min`/`max`
+`bit_size/1` constraints.
+""".
+-spec bitstring(bitstring_options()) -> parser(bitstring()).
+bitstring(Options) ->
+    fun
+        (Input) when is_bitstring(Input) ->
+            Errors =
+                maps:fold(
+                    fun
+                        (min, Min, Es) when bit_size(Input) < Min ->
+                            [bitstring_too_short | Es];
+                        (min, _Min, Es) ->
+                            Es;
+                        (max, Max, Es) when bit_size(Input) > Max ->
+                            [bitstring_too_long | Es];
+                        (max, _Max, Es) ->
+                            Es
+                    end,
+                    [],
+                    Options
+                ),
+            case Errors of
+                [] -> {ok, Input};
+                _ -> {error, Errors}
+            end;
+        (_Invalid) ->
+            {error, [not_bitstring]}
     end.
 
 -doc """
@@ -290,6 +342,36 @@ integer(Options) ->
             {error, [not_integer]}
     end.
 
+-doc "Validate that input is a positive integer (>= 1).".
+-spec pos_integer() -> parser(pos_integer()).
+pos_integer() ->
+    fun
+        (Input) when is_integer(Input), Input >= 1 ->
+            {ok, Input};
+        (_Invalid) ->
+            {error, [not_pos_integer]}
+    end.
+
+-doc "Validate that input is a non-negative integer (>= 0).".
+-spec non_neg_integer() -> parser(non_neg_integer()).
+non_neg_integer() ->
+    fun
+        (Input) when is_integer(Input), Input >= 0 ->
+            {ok, Input};
+        (_Invalid) ->
+            {error, [not_non_neg_integer]}
+    end.
+
+-doc "Validate that input is a negative integer (=< -1).".
+-spec neg_integer() -> parser(neg_integer()).
+neg_integer() ->
+    fun
+        (Input) when is_integer(Input), Input =< -1 ->
+            {ok, Input};
+        (_Invalid) ->
+            {error, [not_neg_integer]}
+    end.
+
 -doc #{equiv => float / 1}.
 -spec float() -> parser(float()).
 float() ->
@@ -323,6 +405,28 @@ float(Options) ->
             end;
         (_Invalid) ->
             {error, [not_float]}
+    end.
+
+-doc "Validate that input is a function (any arity).".
+-spec function() -> parser(fun()).
+function() ->
+    fun
+        (Input) when is_function(Input) ->
+            {ok, Input};
+        (_Invalid) ->
+            {error, [not_function]}
+    end.
+
+-doc "Validate that input is a function with the given arity.".
+-spec function(arity()) -> parser(fun()).
+function(Arity) ->
+    fun
+        (Input) when is_function(Input, Arity) ->
+            {ok, Input};
+        (Input) when is_function(Input) ->
+            {error, [function_arity_mismatch]};
+        (_Invalid) ->
+            {error, [not_function]}
     end.
 
 -doc "Validate that input is a number (integer or float).".
@@ -691,3 +795,31 @@ issue({no_match, Branches}, RevPath) ->
             branches => [issues(B) || B <- Branches]
         }
     ].
+
+-doc """
+Format `t:issues/0` as a human-readable binary, one issue per line in
+the form `path: code [extras]`. Empty paths render as `(root)`.
+Useful for logs and human-facing error output.
+""".
+-spec format_issues(issues()) -> binary().
+format_issues(Issues) ->
+    iolist_to_binary([format_issue(I) || I <- Issues]).
+
+format_issue(#{path := Path, code := Code} = Issue) ->
+    Extras = maps:without([path, code], Issue),
+    [format_path(Path), ": ", atom_to_binary(Code), format_extras(Extras), $\n].
+
+format_path([]) ->
+    <<"(root)">>;
+format_path(Segs) ->
+    lists:join($., [format_seg(S) || S <- Segs]).
+
+format_seg(S) when is_atom(S) -> atom_to_binary(S);
+format_seg(S) when is_integer(S) -> integer_to_binary(S);
+format_seg(S) when is_binary(S) -> S;
+format_seg(S) -> io_lib:format("~tp", [S]).
+
+format_extras(Map) when map_size(Map) =:= 0 ->
+    <<>>;
+format_extras(Map) ->
+    [" ", io_lib:format("~tp", [Map])].

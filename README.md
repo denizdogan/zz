@@ -50,6 +50,12 @@ Z = zz:map(#{
 A parser is a `t:parser/1` — a function from input to `{ok, Value} |
 {error, Errors}`. Run it via `zz:parse/2`.
 
+### Any
+
+```erlang
+zz:any().         %% accepts anything; output = input
+```
+
 ### Atoms
 
 ```erlang
@@ -67,6 +73,16 @@ zz:binary(#{min => Min, max => Max, regex => Pattern}).
 Errors: `not_binary`, `binary_too_short`, `binary_too_long`,
 `regex_mismatch`. `min` and `max` measure `byte_size/1`. `regex` accepts
 any `re:run/2`-compatible pattern.
+
+### Bitstrings
+
+```erlang
+zz:bitstring().
+zz:bitstring(#{min => MinBits, max => MaxBits}).
+```
+
+Errors: `not_bitstring`, `bitstring_too_short`, `bitstring_too_long`.
+`min` and `max` measure `bit_size/1`.
 
 ### Booleans
 
@@ -93,6 +109,14 @@ zz:integer(#{min => Min, max => Max}).
 ```
 
 Errors: `not_integer`, `integer_too_small`, `integer_too_large`.
+
+Typed shortcuts:
+
+```erlang
+zz:pos_integer().      %% >= 1; {error, [not_pos_integer]}
+zz:non_neg_integer().  %% >= 0; {error, [not_non_neg_integer]}
+zz:neg_integer().      %% =< -1; {error, [not_neg_integer]}
+```
 
 ### Floats
 
@@ -123,9 +147,9 @@ Errors: `not_iodata`, `not_iolist`.
 ### Lists
 
 ```erlang
-zz:list().                         %% any list, contents not validated
-zz:list(zz:integer()).              %% homogeneous list
-zz:list(zz:integer(), #{min => 1, max => 10}).
+zz:list().                                      %% any list, contents not validated
+zz:list(zz:integer()).                          %% homogeneous list
+zz:list(zz:integer(), #{min => 1, max => 10}).  %% with length options
 ```
 
 Errors: `not_list`, `list_too_short`, `list_too_long`. Element errors
@@ -180,7 +204,7 @@ zz:literal(<<"hello">>).
 
 ```erlang
 zz:tuple().                              %% any tuple, contents not validated
-zz:tuple({zz:integer(), zz:binary()}).     %% fixed-arity, per-position parsers
+zz:tuple({zz:integer(), zz:binary()}).   %% fixed-arity, per-position parsers
 ```
 
 Errors: `not_tuple`, `arity_mismatch`. Element errors are wrapped as
@@ -214,6 +238,15 @@ union of `literal/1`s but with a flat error code.
 zz:pid().         %% {error, [not_pid]} on non-pid
 zz:reference().   %% {error, [not_reference]} on non-reference
 ```
+
+### Functions
+
+```erlang
+zz:function().    %% any function
+zz:function(2).   %% function with arity 2
+```
+
+Errors: `not_function`, `function_arity_mismatch`.
 
 ### Optional
 
@@ -308,6 +341,16 @@ Useful for JSON serialization, logging, etc.
 > friends explicitly document the order as undefined. zz targets OTP
 > 27+; treat the order as undefined and sort by `path` if you need
 > deterministic output.
+
+### Formatted output
+
+`zz:format_issues/1` renders issues as a human-readable binary, one
+issue per line:
+
+```erlang
+zz:format_issues(zz:issues(Errs)).
+%% <<"name: not_binary\nfriends.1.age: integer_too_small\n">>
+```
 
 ## Development
 
