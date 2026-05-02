@@ -1,6 +1,6 @@
 {application, zz, [
     {description, "Zod-like parsing and validation for Erlang"},
-    {vsn, "0.2.0"},
+    {vsn, "0.2.1"},
     {registered, []},
     {applications, [kernel, stdlib]},
     {env, []},

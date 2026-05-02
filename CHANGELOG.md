@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-02
+
+### Changed
+
+- Performance: scalar parser options are now extracted at parser
+  construction time rather than folded over the options map on every
+  parse call. `map/0` short-circuits to a plain `is_map` check. Median
+  speedups (1M iter, OTP 28 / ARM macOS): `binary/1`, `integer/1`,
+  `float/1` with options ~5x; `map/0` ~6x; `list/1,2` over 100
+  elements ~2x; `map/1,2` schemas 1.2-1.4x; `map_of/2` 1.4x. See
+  `test/zz_bench.erl`.
+
+### Fixed
+
+- Doc type cross-references in README and CHANGELOG now use
+  module-qualified syntax (`t:zz:parser/1`, `t:zz:issues/0`),
+  eliminating ex_doc warnings on publish.
+
+### Tooling
+
+- Added `mise format-check` task (parity with CI's `rebar3 fmt
+  --check`).
+- Added `mise bench` task and `test/zz_bench.erl` micro-benchmark
+  harness.
+- Added `CODE_OF_CONDUCT.md`.
+- Split `integer_typed_tests` into `pos_integer_tests`,
+  `non_neg_integer_tests`, `neg_integer_tests` for consistency with
+  the one-file-per-function project convention.
+
 ## [0.2.0] - 2026-05-02
 
 ### Added
@@ -85,6 +114,7 @@ Initial public release.
   `list_options/0`, `map_options/0`, `schema/0`.
 - eqwalizer-clean: `elp eqwalize-all` reports no errors.
 
-[Unreleased]: https://github.com/denizdogan/zz/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/denizdogan/zz/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/denizdogan/zz/releases/tag/v0.2.1
 [0.2.0]: https://github.com/denizdogan/zz/releases/tag/v0.2.0
 [0.1.0]: https://github.com/denizdogan/zz/releases/tag/v0.1.0
