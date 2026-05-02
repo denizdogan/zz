@@ -47,8 +47,8 @@ Z = zz:map(#{
 
 ## API
 
-A parser is a `fun((term()) -> {ok, term()} | {error, [term()]})`. Run it
-via `zz:parse/2`.
+A parser is a `t:parser/1` — a function from input to `{ok, Value} |
+{error, Errors}`. Run it via `zz:parse/2`.
 
 ### Atoms
 
@@ -61,7 +61,7 @@ zz:atom().
 
 ```erlang
 zz:binary().
-zz:binary(#{min => N, max => N, regex => Pattern}).
+zz:binary(#{min => Min, max => Max, regex => Pattern}).
 ```
 
 Errors: `not_binary`, `binary_too_short`, `binary_too_long`,
@@ -89,7 +89,7 @@ wrapped as `{list, Index, [not_char]}` with 1-based `Index`.
 
 ```erlang
 zz:integer().
-zz:integer(#{min => N, max => N}).
+zz:integer(#{min => Min, max => Max}).
 ```
 
 Errors: `not_integer`, `integer_too_small`, `integer_too_large`.
@@ -98,7 +98,7 @@ Errors: `not_integer`, `integer_too_small`, `integer_too_large`.
 
 ```erlang
 zz:float().
-zz:float(#{min => N, max => N}).
+zz:float(#{min => Min, max => Max}).
 ```
 
 Errors: `not_float`, `float_too_small`, `float_too_large`. Integers are
@@ -217,8 +217,9 @@ zz:reference().   %% {error, [not_reference]} on non-reference
 
 ### Optional
 
-`zz:optional(Parser)` wraps a parser for use as a map schema value. Has no
-effect outside a `zz:map/1,2` schema.
+`zz:optional(Parser)` marks a key as optional inside a `zz:map/1,2`
+schema. Not a standalone parser — calling `zz:parse/2` on the result
+directly crashes.
 
 ### Nullable
 
