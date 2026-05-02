@@ -7,26 +7,26 @@
 %%%===========================================================================
 
 empty_list_test() ->
-    ?Z_OK(z:list(), []).
+    ?Z_OK(zz:list(), []).
 
 mixed_list_test() ->
-    ?Z_OK(z:list(), [<<"foo">>, bar, 3]).
+    ?Z_OK(zz:list(), [<<"foo">>, bar, 3]).
 
 non_list_input_test() ->
-    ?assertEqual({error, [not_list]}, z:parse(z:list(z:integer()), <<"foo">>)).
+    ?assertEqual({error, [not_list]}, zz:parse(zz:list(zz:integer()), <<"foo">>)).
 
 %%%===========================================================================
 %%% list/1 — homogeneous list with element parser
 %%%===========================================================================
 
 empty_homogeneous_list_test() ->
-    ?Z_OK(z:list(z:integer()), []).
+    ?Z_OK(zz:list(zz:integer()), []).
 
 singleton_homogeneous_list_test() ->
-    ?Z_OK(z:list(z:integer()), [1]).
+    ?Z_OK(zz:list(zz:integer()), [1]).
 
 multi_homogeneous_list_test() ->
-    ?Z_OK(z:list(z:integer()), [1, 2, 3]).
+    ?Z_OK(zz:list(zz:integer()), [1, 2, 3]).
 
 homogeneous_element_errors_test() ->
     ?assertEqual(
@@ -34,7 +34,7 @@ homogeneous_element_errors_test() ->
             {list, 2, [not_integer]},
             {list, 5, [not_integer]}
         ]},
-        z:parse(z:list(z:integer()), [1, <<"2">>, 3, 4, <<"5">>])
+        zz:parse(zz:list(zz:integer()), [1, <<"2">>, 3, 4, <<"5">>])
     ).
 
 %%%===========================================================================
@@ -42,21 +42,21 @@ homogeneous_element_errors_test() ->
 %%%===========================================================================
 
 fixed_length_non_list_input_test() ->
-    ?assertEqual({error, [not_list]}, z:parse(z:list([]), {})).
+    ?assertEqual({error, [not_list]}, zz:parse(zz:list([]), {})).
 
 fixed_length_empty_match_test() ->
-    ?assertEqual({ok, []}, z:parse(z:list([]), [])).
+    ?assertEqual({ok, []}, zz:parse(zz:list([]), [])).
 
 fixed_length_too_short_test() ->
     ?assertEqual(
         {error, [length_mismatch]},
-        z:parse(z:list([z:integer()]), [])
+        zz:parse(zz:list([zz:integer()]), [])
     ).
 
 fixed_length_match_test() ->
     ?assertEqual(
         {ok, [3, <<"foo">>]},
-        z:parse(z:list([z:integer(), z:binary()]), [3, <<"foo">>])
+        zz:parse(zz:list([zz:integer(), zz:binary()]), [3, <<"foo">>])
     ).
 
 fixed_length_position_errors_test() ->
@@ -65,7 +65,7 @@ fixed_length_position_errors_test() ->
             {list, 1, [not_integer]},
             {list, 2, [not_binary]}
         ]},
-        z:parse(z:list([z:integer(), z:binary()]), [<<"three">>, foo])
+        zz:parse(zz:list([zz:integer(), zz:binary()]), [<<"three">>, foo])
     ).
 
 %%%===========================================================================
@@ -73,35 +73,35 @@ fixed_length_position_errors_test() ->
 %%%===========================================================================
 
 max_satisfied_test() ->
-    Z = z:list(z:integer(), #{max => 2}),
-    ?assertEqual({ok, []}, z:parse(Z, [])),
-    ?assertEqual({ok, [1]}, z:parse(Z, [1])),
-    ?assertEqual({ok, [1, 2]}, z:parse(Z, [1, 2])).
+    Z = zz:list(zz:integer(), #{max => 2}),
+    ?assertEqual({ok, []}, zz:parse(Z, [])),
+    ?assertEqual({ok, [1]}, zz:parse(Z, [1])),
+    ?assertEqual({ok, [1, 2]}, zz:parse(Z, [1, 2])).
 
 max_violated_test() ->
-    Z = z:list(z:integer(), #{max => 2}),
-    ?assertEqual({error, [list_too_long]}, z:parse(Z, [1, 2, 3])).
+    Z = zz:list(zz:integer(), #{max => 2}),
+    ?assertEqual({error, [list_too_long]}, zz:parse(Z, [1, 2, 3])).
 
 min_satisfied_test() ->
-    Z = z:list(z:integer(), #{min => 2}),
-    ?assertEqual({ok, [1, 2]}, z:parse(Z, [1, 2])),
-    ?assertEqual({ok, [1, 2, 3]}, z:parse(Z, [1, 2, 3])).
+    Z = zz:list(zz:integer(), #{min => 2}),
+    ?assertEqual({ok, [1, 2]}, zz:parse(Z, [1, 2])),
+    ?assertEqual({ok, [1, 2, 3]}, zz:parse(Z, [1, 2, 3])).
 
 min_violated_test() ->
-    Z = z:list(z:integer(), #{min => 2}),
-    ?assertEqual({error, [list_too_short]}, z:parse(Z, [])),
-    ?assertEqual({error, [list_too_short]}, z:parse(Z, [1])).
+    Z = zz:list(zz:integer(), #{min => 2}),
+    ?assertEqual({error, [list_too_short]}, zz:parse(Z, [])),
+    ?assertEqual({error, [list_too_short]}, zz:parse(Z, [1])).
 
 min_max_combined_test() ->
-    Z = z:list(z:integer(), #{min => 1, max => 3}),
-    ?assertEqual({error, [list_too_short]}, z:parse(Z, [])),
-    ?assertEqual({ok, [1]}, z:parse(Z, [1])),
-    ?assertEqual({ok, [1, 2, 3]}, z:parse(Z, [1, 2, 3])),
-    ?assertEqual({error, [list_too_long]}, z:parse(Z, [1, 2, 3, 4])).
+    Z = zz:list(zz:integer(), #{min => 1, max => 3}),
+    ?assertEqual({error, [list_too_short]}, zz:parse(Z, [])),
+    ?assertEqual({ok, [1]}, zz:parse(Z, [1])),
+    ?assertEqual({ok, [1, 2, 3]}, zz:parse(Z, [1, 2, 3])),
+    ?assertEqual({error, [list_too_long]}, zz:parse(Z, [1, 2, 3, 4])).
 
 max_with_invalid_elements_test() ->
-    Z = z:list(z:integer(), #{max => 5}),
+    Z = zz:list(zz:integer(), #{max => 5}),
     ?assertEqual(
         {error, [{list, 2, [not_integer]}]},
-        z:parse(Z, [1, foo, 3])
+        zz:parse(Z, [1, foo, 3])
     ).

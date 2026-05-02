@@ -1,4 +1,4 @@
--module(z).
+-module(zz).
 
 -moduledoc """
 Zod-like parsing and validation for Erlang.
@@ -7,8 +7,8 @@ Each combinator returns a `t:parser/0` — a function from input to a
 `t:result/1`. Compose them, then run with `parse/2`:
 
 ```erlang
-Z = z:map(#{name => z:binary(), age => z:integer(#{min => 0})}),
-{ok, _} = z:parse(Z, #{name => <<"x">>, age => 1}).
+Z = zz:map(#{name => zz:binary(), age => zz:integer(#{min => 0})}),
+{ok, _} = zz:parse(Z, #{name => <<"x">>, age => 1}).
 ```
 """.
 

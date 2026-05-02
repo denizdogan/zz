@@ -1,12 +1,12 @@
-# z
+# zz
 
-[![CI](https://github.com/denizdogan/z/actions/workflows/ci.yml/badge.svg)](https://github.com/denizdogan/z/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/denizdogan/z/branch/main/graph/badge.svg)](https://codecov.io/gh/denizdogan/z)
+[![CI](https://github.com/denizdogan/zz/actions/workflows/ci.yml/badge.svg)](https://github.com/denizdogan/zz/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/denizdogan/zz/branch/main/graph/badge.svg)](https://codecov.io/gh/denizdogan/zz)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE.md)
 
 Zod-like parsing and validation for Erlang.
 
-`z` provides composable parser combinators that validate runtime data
+`zz` provides composable parser combinators that validate runtime data
 against a schema and return either `{ok, Output}` or `{error, Errors}`
 with structured error paths.
 
@@ -15,38 +15,38 @@ with structured error paths.
 Add to `rebar.config`:
 
 ```erlang
-{deps, [{z, "0.1.0"}]}.
+{deps, [{zz, "0.1.0"}]}.
 ```
 
 ## Quick start
 
 ```erlang
-Z = z:map(#{
-    name => z:binary(),
-    age => z:integer(#{min => 0}),
-    tags => z:list(z:atom())
+Z = zz:map(#{
+    name => zz:binary(),
+    age => zz:integer(#{min => 0}),
+    tags => zz:list(zz:atom())
 }),
 
-{ok, _} = z:parse(Z, #{name => <<"alice">>, age => 30, tags => [admin]}).
+{ok, _} = zz:parse(Z, #{name => <<"alice">>, age => 30, tags => [admin]}).
 ```
 
 ## API
 
 A parser is a `fun((term()) -> {ok, term()} | {error, [term()]})`. Run it
-via `z:parse/2`.
+via `zz:parse/2`.
 
 ### Atoms
 
 ```erlang
-z:atom().
+zz:atom().
 %% {error, [not_atom]} on non-atom input.
 ```
 
 ### Binaries
 
 ```erlang
-z:binary().
-z:binary(#{min => N, max => N, regex => Pattern}).
+zz:binary().
+zz:binary(#{min => N, max => N, regex => Pattern}).
 ```
 
 Errors: `not_binary`, `binary_too_short`, `binary_too_long`,
@@ -56,15 +56,15 @@ any `re:run/2`-compatible pattern.
 ### Booleans
 
 ```erlang
-z:boolean().
+zz:boolean().
 %% {error, [not_boolean]} on non-boolean.
 ```
 
 ### Integers
 
 ```erlang
-z:integer().
-z:integer(#{min => N, max => N}).
+zz:integer().
+zz:integer(#{min => N, max => N}).
 ```
 
 Errors: `not_integer`, `integer_too_small`, `integer_too_large`.
@@ -72,20 +72,20 @@ Errors: `not_integer`, `integer_too_small`, `integer_too_large`.
 ### Floats
 
 ```erlang
-z:float().
-z:float(#{min => N, max => N}).
+zz:float().
+zz:float(#{min => N, max => N}).
 ```
 
 Errors: `not_float`, `float_too_small`, `float_too_large`. Integers are
-not accepted — use `z:union([z:integer(), z:float()])` for either.
+not accepted — use `zz:union([zz:integer(), zz:float()])` for either.
 
 ### Lists
 
 ```erlang
-z:list().                         %% any list, contents not validated
-z:list(z:integer()).              %% homogeneous list
-z:list(z:integer(), #{min => 1, max => 10}).
-z:list([z:integer(), z:binary()]).%% fixed-length, per-position parsers
+zz:list().                         %% any list, contents not validated
+zz:list(zz:integer()).              %% homogeneous list
+zz:list(zz:integer(), #{min => 1, max => 10}).
+zz:list([zz:integer(), zz:binary()]).%% fixed-length, per-position parsers
 ```
 
 Errors: `not_list`, `list_too_short`, `list_too_long`, `length_mismatch`
@@ -95,18 +95,18 @@ Errors: `not_list`, `list_too_short`, `list_too_long`, `length_mismatch`
 ### Maps
 
 ```erlang
-z:map().                          %% any map, passthrough
-z:map(Schema).                    %% schema with default unknown_keys => strip
-z:map(Schema, #{unknown_keys => strip | passthrough | strict}).
+zz:map().                          %% any map, passthrough
+zz:map(Schema).                    %% schema with default unknown_keys => strip
+zz:map(Schema, #{unknown_keys => strip | passthrough | strict}).
 ```
 
 `Schema` is a map of `Key => Parser | {optional, Parser}`. Use
-`z:optional/1` to mark optional keys:
+`zz:optional/1` to mark optional keys:
 
 ```erlang
-z:map(#{
-    id => z:integer(),
-    nickname => z:optional(z:binary())
+zz:map(#{
+    id => zz:integer(),
+    nickname => zz:optional(zz:binary())
 }).
 ```
 
@@ -122,16 +122,16 @@ Errors: `not_map`, `{map, Key, missing_key}`, `{map, Key, InnerErrors}`,
 ### Literals
 
 ```erlang
-z:literal(42).
-z:literal(<<"hello">>).
+zz:literal(42).
+zz:literal(<<"hello">>).
 %% Matches with =:=. {error, [not_literal]} otherwise.
 ```
 
 ### Tuples
 
 ```erlang
-z:tuple().                              %% any tuple, contents not validated
-z:tuple([z:integer(), z:binary()]).     %% fixed-arity, per-position parsers
+zz:tuple().                              %% any tuple, contents not validated
+zz:tuple([zz:integer(), zz:binary()]).     %% fixed-arity, per-position parsers
 ```
 
 Errors: `not_tuple`, `arity_mismatch`. Element errors are wrapped as
@@ -140,7 +140,7 @@ Errors: `not_tuple`, `arity_mismatch`. Element errors are wrapped as
 ### Unions
 
 ```erlang
-z:union([z:integer(), z:binary()]).
+zz:union([zz:integer(), zz:binary()]).
 %% First parser to succeed wins.
 ```
 
@@ -151,8 +151,8 @@ yields `{error, [{no_match, []}]}`.
 
 ### Optional
 
-`z:optional(Parser)` wraps a parser for use as a map schema value. Has no
-effect outside a `z:map/1,2` schema.
+`zz:optional(Parser)` wraps a parser for use as a map schema value. Has no
+effect outside a `zz:map/1,2` schema.
 
 ## Error format
 
@@ -172,11 +172,11 @@ nested structure:
 Multiple errors at the same level accumulate.
 
 ```erlang
-Z = z:map(#{
-    name => z:binary(),
-    friends => z:list(z:map(#{age => z:integer(#{min => 0})}))
+Z = zz:map(#{
+    name => zz:binary(),
+    friends => zz:list(zz:map(#{age => zz:integer(#{min => 0})}))
 }),
-z:parse(Z, #{name => 1, friends => [#{age => -1}]}).
+zz:parse(Z, #{name => 1, friends => [#{age => -1}]}).
 %% {error, [
 %%     {map, name, [not_binary]},
 %%     {map, friends, [{list, 1, [{map, age, [integer_too_small]}]}]}

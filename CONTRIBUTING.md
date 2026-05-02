@@ -48,5 +48,5 @@ $ rebar3 hex build                    # validate package locally
 $ rebar3 hex publish                  # requires `rebar3 hex user auth` once
 ```
 
-Bump `vsn` in `src/z.app.src` and the `[Unreleased]` heading in
+Bump `vsn` in `src/zz.app.src` and the `[Unreleased]` heading in
 `CHANGELOG.md` before tagging.

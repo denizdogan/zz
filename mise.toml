@@ -42,8 +42,8 @@ run = """
 set -e
 git diff --quiet || { echo "Working tree dirty — commit or stash first."; exit 1; }
 git diff --cached --quiet || { echo "Staged changes uncommitted."; exit 1; }
-VERSION=$(awk -F'"' '/vsn,/ {print $2}' src/z.app.src)
-[ -n "$VERSION" ] || { echo "Could not read vsn from src/z.app.src"; exit 1; }
+VERSION=$(awk -F'"' '/vsn,/ {print $2}' src/zz.app.src)
+[ -n "$VERSION" ] || { echo "Could not read vsn from src/zz.app.src"; exit 1; }
 echo "Publishing z $VERSION..."
 rebar3 hex publish
 git tag "v$VERSION"

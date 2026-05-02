@@ -1,4 +1,4 @@
--module(prop_z).
+-module(prop_zz).
 
 -eqwalizer(ignore).
 
@@ -7,102 +7,102 @@
 
 -define(VALID(Gen, Parser),
     ?FORALL({Input, Z}, {Gen, Parser}, begin
-        {ok, Input} =:= z:parse(Z, Input)
+        {ok, Input} =:= zz:parse(Z, Input)
     end)
 ).
 
 prop_atom_ok() ->
-    ?VALID(atom(), z:atom()).
+    ?VALID(atom(), zz:atom()).
 
 prop_binary_ok() ->
-    ?VALID(binary(), z:binary()).
+    ?VALID(binary(), zz:binary()).
 
 prop_boolean_ok() ->
-    ?VALID(boolean(), z:boolean()).
+    ?VALID(boolean(), zz:boolean()).
 
 prop_integer_ok() ->
-    ?VALID(integer(), z:integer()).
+    ?VALID(integer(), zz:integer()).
 
 prop_list_ok() ->
-    ?VALID(list(), z:list()).
+    ?VALID(list(), zz:list()).
 
 prop_map_ok() ->
-    ?VALID(map(), z:map()).
+    ?VALID(map(), zz:map()).
 
 prop_tuple_ok() ->
-    ?VALID(tuple(), z:tuple()).
+    ?VALID(tuple(), zz:tuple()).
 
 prop_float_ok() ->
-    ?VALID(float(), z:float()).
+    ?VALID(float(), zz:float()).
 
 prop_literal_ok() ->
-    ?FORALL(T, ground_term(), {ok, T} =:= z:parse(z:literal(T), T)).
+    ?FORALL(T, ground_term(), {ok, T} =:= zz:parse(zz:literal(T), T)).
 
 prop_union_ok() ->
     ?FORALL(
         {Input, Z},
         oneof([
-            {integer(), z:union([z:integer(), z:binary()])},
-            {binary(), z:union([z:integer(), z:binary()])},
-            {boolean(), z:union([z:atom(), z:integer()])}
+            {integer(), zz:union([zz:integer(), zz:binary()])},
+            {binary(), zz:union([zz:integer(), zz:binary()])},
+            {boolean(), zz:union([zz:atom(), zz:integer()])}
         ]),
-        {ok, Input} =:= z:parse(Z, Input)
+        {ok, Input} =:= zz:parse(Z, Input)
     ).
 
 prop_atom_invalid() ->
     ?FORALL(
-        X, not_atom(), {error, [not_atom]} =:= z:parse(z:atom(), X)
+        X, not_atom(), {error, [not_atom]} =:= zz:parse(zz:atom(), X)
     ).
 
 prop_boolean_invalid() ->
     ?FORALL(
-        X, not_boolean(), {error, [not_boolean]} =:= z:parse(z:boolean(), X)
+        X, not_boolean(), {error, [not_boolean]} =:= zz:parse(zz:boolean(), X)
     ).
 
 prop_binary_invalid() ->
     ?FORALL(
-        X, not_binary(), {error, [not_binary]} =:= z:parse(z:binary(), X)
+        X, not_binary(), {error, [not_binary]} =:= zz:parse(zz:binary(), X)
     ).
 
 prop_integer_invalid() ->
     ?FORALL(
-        X, not_integer(), {error, [not_integer]} =:= z:parse(z:integer(), X)
+        X, not_integer(), {error, [not_integer]} =:= zz:parse(zz:integer(), X)
     ).
 
 prop_float_invalid() ->
     ?FORALL(
-        X, not_float(), {error, [not_float]} =:= z:parse(z:float(), X)
+        X, not_float(), {error, [not_float]} =:= zz:parse(zz:float(), X)
     ).
 
 prop_list_invalid() ->
     ?FORALL(
-        X, not_list(), {error, [not_list]} =:= z:parse(z:list(), X)
+        X, not_list(), {error, [not_list]} =:= zz:parse(zz:list(), X)
     ).
 
 prop_tuple_invalid() ->
     ?FORALL(
-        X, not_tuple(), {error, [not_tuple]} =:= z:parse(z:tuple(), X)
+        X, not_tuple(), {error, [not_tuple]} =:= zz:parse(zz:tuple(), X)
     ).
 
 prop_map_invalid() ->
     ?FORALL(
-        X, not_map(), {error, [not_map]} =:= z:parse(z:map(), X)
+        X, not_map(), {error, [not_map]} =:= zz:parse(zz:map(), X)
     ).
 
 prop_basic() ->
     ?FORALL(
         {Input, Z},
         oneof([
-            {atom(), z:atom()},
-            {binary(), z:binary()},
-            {boolean(), z:boolean()},
-            {integer(), z:integer()},
-            {float(), z:float()},
-            {list(), z:list()},
-            {map(), z:map()},
-            {tuple(), z:tuple()}
+            {atom(), zz:atom()},
+            {binary(), zz:binary()},
+            {boolean(), zz:boolean()},
+            {integer(), zz:integer()},
+            {float(), zz:float()},
+            {list(), zz:list()},
+            {map(), zz:map()},
+            {tuple(), zz:tuple()}
         ]),
-        {ok, Input} =:= z:parse(Z, Input)
+        {ok, Input} =:= zz:parse(Z, Input)
     ).
 
 %%%===========================================================================

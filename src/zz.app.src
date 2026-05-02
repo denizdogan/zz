@@ -1,4 +1,4 @@
-{application, z, [
+{application, zz, [
     {description, "Zod-like parsing and validation for Erlang"},
     {vsn, "0.1.0"},
     {registered, []},
@@ -7,7 +7,7 @@
     {modules, []},
     {licenses, ["Apache-2.0"]},
     {links, [
-        {"GitHub", "https://github.com/denizdogan/z"},
-        {"Changelog", "https://github.com/denizdogan/z/blob/main/CHANGELOG.md"}
+        {"GitHub", "https://github.com/denizdogan/zz"},
+        {"Changelog", "https://github.com/denizdogan/zz/blob/main/CHANGELOG.md"}
     ]}
 ]}.

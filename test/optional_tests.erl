@@ -3,8 +3,8 @@
 -include("test.hrl").
 
 optional_shape_test() ->
-    Z = z:atom(),
-    {optional, F} = z:optional(Z),
+    Z = zz:atom(),
+    {optional, F} = zz:optional(Z),
     ?assert(is_function(F, 1)),
     ?assertEqual(Z, F),
     ok.
