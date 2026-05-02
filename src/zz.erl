@@ -49,6 +49,7 @@ path-addressed list of issues with `issues/1`.
     map/1,
     map/2,
     map_of/2,
+    nullable/1,
     number/0,
     optional/1,
     parse/2,
@@ -615,6 +616,14 @@ Validate that input equals (`=:=`) one of `Values`. Fails with
 -spec enum([T]) -> parser(T).
 enum(Values) ->
     fun(Input) -> enum_match(Input, Values) end.
+
+-doc """
+Validate that input is `undefined` or matches `Z`. Sugar for
+`union([literal(undefined), Z])`.
+""".
+-spec nullable(parser(T)) -> parser(T | undefined).
+nullable(Z) ->
+    union([literal(undefined), Z]).
 
 enum_match(_, []) ->
     {error, [not_in_enum]};

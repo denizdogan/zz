@@ -205,6 +205,11 @@ zz:reference().   %% {error, [not_reference]} on non-reference
 `zz:optional(Parser)` wraps a parser for use as a map schema value. Has no
 effect outside a `zz:map/1,2` schema.
 
+### Nullable
+
+`zz:nullable(Parser)` accepts `undefined` alongside `Parser`'s values.
+Sugar for `union([literal(undefined), Parser])`.
+
 ### Lazy
 
 `zz:lazy(fun() -> Parser end)` defers parser construction until parse

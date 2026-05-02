@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `zz:number/0` validates an integer or float.
 - `zz:enum/1` validates that input equals (`=:=`) one of a list of
   values; fails with `not_in_enum`.
+- `zz:nullable/1` accepts `undefined` alongside the wrapped parser's
+  values. Sugar for `union([literal(undefined), Z])`.
 
 ### Changed
 
