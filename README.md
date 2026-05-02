@@ -19,7 +19,7 @@ long.
 Add to `rebar.config`:
 
 ```erlang
-{deps, [{zz, "0.1.0"}]}.
+{deps, [{zz, "0.2.0"}]}.
 ```
 
 ## Quick start
