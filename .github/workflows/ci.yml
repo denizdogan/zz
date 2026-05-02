@@ -71,6 +71,7 @@ jobs:
         with:
           files: codecov.json
           fail_ci_if_error: false
+          use_oidc: true
 
       - name: Dialyzer
         run: rebar3 dialyzer
