@@ -10,6 +10,9 @@ Each combinator returns a `t:parser/0` — a function from input to a
 Z = zz:map(#{name => zz:binary(), age => zz:integer(#{min => 0})}),
 {ok, _} = zz:parse(Z, #{name => <<"x">>, age => 1}).
 ```
+
+On failure, the nested `t:errors/0` shape can be flattened to a
+path-addressed list of issues with `issues/1`.
 """.
 
 -compile({no_auto_import, [float/1]}).
@@ -23,6 +26,7 @@ Z = zz:map(#{name => zz:binary(), age => zz:integer(#{min => 0})}),
     float/1,
     integer/0,
     integer/1,
+    issues/1,
     list/0,
     list/1,
     list/2,
@@ -42,6 +46,9 @@ Z = zz:map(#{name => zz:binary(), age => zz:integer(#{min => 0})}),
     optional_parser/0,
     result/1,
     errors/0,
+    issue/0,
+    issues/0,
+    path/0,
     binary_options/0,
     integer_options/0,
     float_options/0,
@@ -62,6 +69,10 @@ Z = zz:map(#{name => zz:binary(), age => zz:integer(#{min => 0})}),
 
 -type parser() :: fun((term()) -> result(term())).
 -type optional_parser() :: {optional, parser()}.
+
+-type path() :: [term()].
+-type issue() :: #{path := path(), code := atom(), _ => _}.
+-type issues() :: [issue()].
 
 -type binary_options() :: #{
     min => non_neg_integer(),
@@ -448,16 +459,53 @@ yields `{error, [{no_match, []}]}`.
 """.
 -spec union([parser()]) -> parser().
 union(Zs) ->
-    fun(Input) -> try_branches(Zs, Input, []) end.
+    fun(Input) -> union_try(Zs, Input, []) end.
 
-%%%===========================================================================
-%%% Internal functions
-%%%===========================================================================
-
-try_branches([], _Input, Errs) ->
+union_try([], _Input, Errs) ->
     {error, [{no_match, lists:reverse(Errs)}]};
-try_branches([Z | Rest], Input, Errs) ->
+union_try([Z | Rest], Input, Errs) ->
     case Z(Input) of
         {ok, _} = Ok -> Ok;
-        {error, E} -> try_branches(Rest, Input, [E | Errs])
+        {error, E} -> union_try(Rest, Input, [E | Errs])
     end.
+
+-doc """
+Flatten nested `t:errors/0` into a flat list of `t:issue/0` records,
+each with a `path` to the failing position and a `code`.
+
+Compound errors carry extra fields:
+- `unknown_keys` issues include `keys => [term()]`.
+- `no_match` issues include `branches => [issues()]`, one per union
+  branch in input order.
+""".
+-spec issues(errors()) -> issues().
+issues(Errors) ->
+    issues_at(Errors, []).
+
+%% RevPath holds the path reversed during traversal; reversed once at
+%% each leaf so the walk stays O(n) over the error tree instead of O(n^2).
+-spec issues_at(errors(), path()) -> issues().
+issues_at(Errors, RevPath) ->
+    lists:flatmap(fun(E) -> issue(E, RevPath) end, Errors).
+
+-spec issue(error(), path()) -> issues().
+issue(Code, RevPath) when is_atom(Code) ->
+    [#{path => lists:reverse(RevPath), code => Code}];
+issue({list, N, Es}, RevPath) ->
+    issues_at(Es, [N | RevPath]);
+issue({tuple, N, Es}, RevPath) ->
+    issues_at(Es, [N | RevPath]);
+issue({map, K, missing_key}, RevPath) ->
+    [#{path => lists:reverse([K | RevPath]), code => missing_key}];
+issue({map, K, Es}, RevPath) when is_list(Es) ->
+    issues_at(Es, [K | RevPath]);
+issue({unknown_keys, Keys}, RevPath) ->
+    [#{path => lists:reverse(RevPath), code => unknown_keys, keys => Keys}];
+issue({no_match, Branches}, RevPath) ->
+    [
+        #{
+            path => lists:reverse(RevPath),
+            code => no_match,
+            branches => [issues(B) || B <- Branches]
+        }
+    ].

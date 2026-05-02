@@ -183,6 +183,21 @@ zz:parse(Z, #{name => 1, friends => [#{age => -1}]}).
 %% ]}
 ```
 
+### Flat issue list
+
+`zz:issues/1` flattens errors into a list of `#{path, code}` maps:
+
+```erlang
+{error, Errs} = zz:parse(Z, #{name => 1, friends => [#{age => -1}]}),
+zz:issues(Errs).
+%% [
+%%     #{path => [name],            code => not_binary},
+%%     #{path => [friends, 1, age], code => integer_too_small}
+%% ]
+```
+
+Useful for JSON serialization, logging, etc.
+
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full setup. Quick start

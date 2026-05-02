@@ -105,6 +105,42 @@ prop_basic() ->
         {ok, Input} =:= zz:parse(Z, Input)
     ).
 
+prop_issues_total() ->
+    ?FORALL(
+        {Input, Z},
+        oneof([
+            {not_atom(), zz:atom()},
+            {not_binary(), zz:binary()},
+            {not_boolean(), zz:boolean()},
+            {not_integer(), zz:integer()},
+            {not_float(), zz:float()},
+            {not_list(), zz:list()},
+            {not_tuple(), zz:tuple()},
+            {not_map(), zz:map()},
+            {any(), zz:literal(forty_two)},
+            {any(), zz:union([zz:integer(), zz:binary()])},
+            {any(), zz:list(zz:integer())},
+            {any(), zz:tuple([zz:integer(), zz:binary()])},
+            {any(), zz:map(#{name => zz:binary()})},
+            {any(), zz:map(#{}, #{unknown_keys => strict})}
+        ]),
+        case zz:parse(Z, Input) of
+            {ok, _} ->
+                true;
+            {error, Errs} ->
+                Issues = zz:issues(Errs),
+                is_list(Issues) andalso
+                    lists:all(
+                        fun(I) ->
+                            is_map(I) andalso
+                                maps:is_key(path, I) andalso
+                                maps:is_key(code, I)
+                        end,
+                        Issues
+                    )
+        end
+    ).
+
 %%%===========================================================================
 %%% GENERATORS
 %%%===========================================================================

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `zz:issues/1` flattens nested `errors()` into a flat list of issue
+  maps with `path` and `code`. `unknown_keys` issues carry `keys`;
+  `no_match` issues carry `branches` (one nested issue list per union
+  branch).
+- New exported types: `issue/0`, `issues/0`, `path/0`.
+
 ## [0.1.0] - 2026-05-02
 
 Initial public release.
