@@ -1,0 +1,53 @@
+[tools]
+erlang = "latest"
+rebar = "latest"
+
+[tasks.compile]
+run = "rebar3 compile"
+
+[tasks.clean]
+run = "rebar3 clean"
+
+[tasks.format]
+run = "rebar3 fmt"
+
+[tasks.test]
+run = "mise eunit && mise prop"
+
+[tasks.eunit]
+run = "rebar3 as test do eunit"
+
+[tasks.prop]
+run = "rebar3 as test do proper"
+
+[tasks.dialyzer]
+run = "rebar3 dialyzer"
+
+[tasks.docs]
+run = "rebar3 ex_doc"
+
+[tasks.check]
+run = """
+rebar3 compile
+rebar3 fmt --check
+rebar3 as test do eunit
+rebar3 as test do proper
+rebar3 dialyzer
+elp eqwalize-all
+"""
+
+[tasks.eq]
+run = "elp eqwalize"
+
+[tasks.eq-all]
+run = "elp eqwalize-all"
+
+[tasks.erl]
+run = "rebar3 shell"
+
+[tasks.cover]
+run = """
+rebar3 as test do eunit --cover --cover_export_name=suite1
+rebar3 as test do cover --verbose
+open ./_build/test/cover/aggregate/z.html
+"""
