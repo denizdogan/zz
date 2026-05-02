@@ -105,7 +105,7 @@ atom() ->
             {error, [not_atom]}
     end.
 
--doc "Validate that input is a binary.".
+-doc #{equiv => binary / 1}.
 -spec binary() -> parser(binary()).
 binary() ->
     binary(#{}).
@@ -160,7 +160,7 @@ boolean() ->
             {error, [not_boolean]}
     end.
 
--doc "Validate that input is an integer.".
+-doc #{equiv => integer / 1}.
 -spec integer() -> parser(integer()).
 integer() ->
     integer(#{}).
@@ -195,7 +195,7 @@ integer(Options) ->
             {error, [not_integer]}
     end.
 
--doc "Validate that input is a float.".
+-doc #{equiv => float / 1}.
 -spec float() -> parser(float()).
 float() ->
     float(#{}).
@@ -240,7 +240,7 @@ list() ->
             {error, [not_list]}
     end.
 
--doc "Validate a homogeneous list (equivalent to `list(Z, #{})`).".
+-doc #{equiv => list / 2}.
 -spec list(parser(T)) -> parser([T]).
 list(Z) ->
     list(Z, #{}).
@@ -301,7 +301,7 @@ literal(Value) ->
 map() ->
     map(#{}, #{unknown_keys => passthrough}).
 
--doc "Validate a map against `Schema` (equivalent to `map(Schema, #{})`).".
+-doc #{equiv => map / 2}.
 -spec map(schema()) -> parser(#{term() => term()}).
 map(Schema) ->
     map(Schema, #{}).
