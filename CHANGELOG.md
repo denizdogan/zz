@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   type (e.g. `parse(zz:integer(), X) -> result(integer())`).
   `parser/0` and `optional_parser/0` remain as `parser(term())` /
   `optional_parser(term())` aliases for back-compat.
+- `zz:lazy/1` defers parser construction so schemas can reference
+  themselves (recursive shapes like trees and JSON-like values).
 
 ## [0.1.0] - 2026-05-02
 

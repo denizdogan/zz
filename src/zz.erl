@@ -27,6 +27,7 @@ path-addressed list of issues with `issues/1`.
     integer/0,
     integer/1,
     issues/1,
+    lazy/1,
     list/0,
     list/1,
     list/2,
@@ -410,6 +411,35 @@ optional key may be absent without producing an error.
 -spec optional(parser(T)) -> optional_parser(T).
 optional(Z) ->
     {optional, Z}.
+
+-doc """
+Defer construction of a parser until parse time. Use to build
+self-referential (recursive) schemas without infinite recursion at
+definition time.
+
+`Thunk` is called on every descent into the lazy parser, so it should
+be cheap (typically just `fun() -> some_parser_fn() end`). The thunk
+must return a fresh parser — returning the lazy parser itself would
+loop forever at parse time.
+
+```erlang
+tree() ->
+    zz:union([
+        zz:literal(leaf),
+        zz:tuple([
+            zz:literal(node),
+            zz:lazy(fun() -> tree() end),
+            zz:lazy(fun() -> tree() end)
+        ])
+    ]).
+```
+""".
+-spec lazy(fun(() -> parser(T))) -> parser(T).
+lazy(Thunk) ->
+    fun(Input) ->
+        Z = Thunk(),
+        Z(Input)
+    end.
 
 -doc "Validate that input is a tuple (passthrough on contents).".
 -spec tuple() -> parser(tuple()).

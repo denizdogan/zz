@@ -154,6 +154,36 @@ yields `{error, [{no_match, []}]}`.
 `zz:optional(Parser)` wraps a parser for use as a map schema value. Has no
 effect outside a `zz:map/1,2` schema.
 
+### Lazy
+
+`zz:lazy(fun() -> Parser end)` defers parser construction until parse
+time. Use it to build self-referential (recursive) schemas. The thunk
+runs on every descent, so keep it cheap.
+
+Binary tree:
+
+```erlang
+tree() ->
+    zz:union([
+        zz:literal(leaf),
+        zz:tuple([
+            zz:literal(node),
+            zz:lazy(fun() -> tree() end),
+            zz:lazy(fun() -> tree() end)
+        ])
+    ]).
+```
+
+Tree with arbitrary children — a label and a list of child nodes:
+
+```erlang
+node_tree() ->
+    zz:tuple([
+        zz:atom(),
+        zz:list(zz:lazy(fun() -> node_tree() end))
+    ]).
+```
+
 ## Error format
 
 Errors are a list. Each entry is either a leaf atom (`not_atom`,
