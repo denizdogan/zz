@@ -36,6 +36,7 @@ path-addressed list of issues with `issues/1`.
     map/2,
     optional/1,
     parse/2,
+    transform/2,
     tuple/0,
     tuple/1,
     union/1
@@ -43,7 +44,9 @@ path-addressed list of issues with `issues/1`.
 
 -export_type([
     parser/0,
+    parser/1,
     optional_parser/0,
+    optional_parser/1,
     result/1,
     errors/0,
     issue/0,
@@ -67,8 +70,10 @@ path-addressed list of issues with `issues/1`.
     | {unknown_keys, [term()]}
     | {no_match, [errors()]}.
 
--type parser() :: fun((term()) -> result(term())).
--type optional_parser() :: {optional, parser()}.
+-type parser(T) :: fun((term()) -> result(T)).
+-type parser() :: parser(term()).
+-type optional_parser(T) :: {optional, parser(T)}.
+-type optional_parser() :: optional_parser(term()).
 
 -type path() :: [term()].
 -type issue() :: #{path := path(), code := atom(), _ => _}.
@@ -86,12 +91,12 @@ path-addressed list of issues with `issues/1`.
 -type schema() :: #{term() => parser() | optional_parser()}.
 
 -doc "Run parser `Z` against `Input`.".
--spec parse(parser(), term()) -> result(term()).
+-spec parse(parser(T), term()) -> result(T).
 parse(Z, Input) ->
     Z(Input).
 
 -doc "Validate that input is an atom.".
--spec atom() -> parser().
+-spec atom() -> parser(atom()).
 atom() ->
     fun
         (Input) when is_atom(Input) ->
@@ -101,7 +106,7 @@ atom() ->
     end.
 
 -doc "Validate that input is a binary.".
--spec binary() -> parser().
+-spec binary() -> parser(binary()).
 binary() ->
     binary(#{}).
 
@@ -109,7 +114,7 @@ binary() ->
 Validate that input is a binary, with optional `min`/`max` byte size and
 `regex` constraints.
 """.
--spec binary(binary_options()) -> parser().
+-spec binary(binary_options()) -> parser(binary()).
 binary(Options) ->
     fun
         (Input) when is_binary(Input) ->
@@ -146,7 +151,7 @@ binary(Options) ->
     end.
 
 -doc "Validate that input is a boolean.".
--spec boolean() -> parser().
+-spec boolean() -> parser(boolean()).
 boolean() ->
     fun
         (Input) when is_boolean(Input) ->
@@ -156,12 +161,12 @@ boolean() ->
     end.
 
 -doc "Validate that input is an integer.".
--spec integer() -> parser().
+-spec integer() -> parser(integer()).
 integer() ->
     integer(#{}).
 
 -doc "Validate that input is an integer, with optional `min`/`max`.".
--spec integer(integer_options()) -> parser().
+-spec integer(integer_options()) -> parser(integer()).
 integer(Options) ->
     fun
         (Input) when is_integer(Input) ->
@@ -191,12 +196,12 @@ integer(Options) ->
     end.
 
 -doc "Validate that input is a float.".
--spec float() -> parser().
+-spec float() -> parser(float()).
 float() ->
     float(#{}).
 
 -doc "Validate that input is a float, with optional `min`/`max`.".
--spec float(float_options()) -> parser().
+-spec float(float_options()) -> parser(float()).
 float(Options) ->
     fun
         (Input) when is_float(Input) ->
@@ -226,7 +231,7 @@ float(Options) ->
     end.
 
 -doc "Validate that input is a list (any contents).".
--spec list() -> parser().
+-spec list() -> parser([term()]).
 list() ->
     fun
         (Input) when is_list(Input) ->
@@ -242,7 +247,9 @@ element is parsed by the corresponding parser.
 With a single parser, validate a homogeneous list (equivalent to
 `list(Z, #{})`).
 """.
--spec list([parser()] | parser()) -> parser().
+-spec list
+    (parser(T)) -> parser([T]);
+    ([parser()]) -> parser([term()]).
 list(Zs) when is_list(Zs) ->
     Length = length(Zs),
     fun
@@ -279,7 +286,7 @@ list(Z) ->
 Validate a homogeneous list, parsing each element with `Z`. Optional
 `min`/`max` constrain length.
 """.
--spec list(parser(), list_options()) -> parser().
+-spec list(parser(T), list_options()) -> parser([T]).
 list(Z, Options) ->
     fun
         (Input) when is_list(Input) ->
@@ -317,22 +324,22 @@ list(Z, Options) ->
     end.
 
 -doc "Validate that input equals `Value` exactly (`=:=`).".
--spec literal(term()) -> parser().
+-spec literal(T) -> parser(T).
 literal(Value) ->
     fun
         (Input) when Input =:= Value ->
-            {ok, Input};
+            {ok, Value};
         (_Invalid) ->
             {error, [not_literal]}
     end.
 
 -doc "Validate that input is a map (passthrough on contents).".
--spec map() -> parser().
+-spec map() -> parser(#{term() => term()}).
 map() ->
     map(#{}, #{unknown_keys => passthrough}).
 
 -doc "Validate a map against `Schema` (equivalent to `map(Schema, #{})`).".
--spec map(schema()) -> parser().
+-spec map(schema()) -> parser(#{term() => term()}).
 map(Schema) ->
     map(Schema, #{}).
 
@@ -341,7 +348,7 @@ Validate a map against `Schema`. `unknown_keys` controls handling of keys
 not in `Schema`: `strip` (drop, default), `passthrough` (keep), `strict`
 (error).
 """.
--spec map(schema(), map_options()) -> parser().
+-spec map(schema(), map_options()) -> parser(#{term() => term()}).
 map(Schema, Options) ->
     fun
         (Input) when is_map(Input) ->
@@ -401,12 +408,12 @@ map(Schema, Options) ->
 Mark a parser as optional in a `t:schema/0`. Inside a `map/2` schema, an
 optional key may be absent without producing an error.
 """.
--spec optional(parser()) -> optional_parser().
+-spec optional(parser(T)) -> optional_parser(T).
 optional(Z) ->
     {optional, Z}.
 
 -doc "Validate that input is a tuple (passthrough on contents).".
--spec tuple() -> parser().
+-spec tuple() -> parser(tuple()).
 tuple() ->
     fun
         (Input) when is_tuple(Input) ->
@@ -420,7 +427,7 @@ Validate a fixed-arity tuple where each element is parsed by the
 corresponding parser in `Zs`. Element errors are wrapped as
 `{tuple, Index, InnerErrors}` with 1-based `Index`.
 """.
--spec tuple([parser()]) -> parser().
+-spec tuple([parser()]) -> parser(tuple()).
 tuple(Zs) when is_list(Zs) ->
     Arity = length(Zs),
     fun
@@ -457,7 +464,7 @@ Validate against the first parser that succeeds. If none match, returns
 errors list from the corresponding parser, in input order. Empty union
 yields `{error, [{no_match, []}]}`.
 """.
--spec union([parser()]) -> parser().
+-spec union([parser(T)]) -> parser(T).
 union(Zs) ->
     fun(Input) -> union_try(Zs, Input, []) end.
 
@@ -467,6 +474,24 @@ union_try([Z | Rest], Input, Errs) ->
     case Z(Input) of
         {ok, _} = Ok -> Ok;
         {error, E} -> union_try(Rest, Input, [E | Errs])
+    end.
+
+-doc """
+Run `Z`, then apply `Fun` to the parsed value on success. Errors pass
+through unchanged.
+
+```erlang
+ToAtom = zz:transform(zz:binary(), fun binary_to_atom/1),
+{ok, hello} = zz:parse(ToAtom, <<"hello">>).
+```
+""".
+-spec transform(parser(T), fun((T) -> U)) -> parser(U).
+transform(Z, Fun) ->
+    fun(Input) ->
+        case Z(Input) of
+            {ok, V} -> {ok, Fun(V)};
+            {error, _} = Err -> Err
+        end
     end.
 
 -doc """
