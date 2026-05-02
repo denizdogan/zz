@@ -154,15 +154,6 @@ yields `{error, [{no_match, []}]}`.
 `zz:optional(Parser)` wraps a parser for use as a map schema value. Has no
 effect outside a `zz:map/1,2` schema.
 
-### Transform
-
-`zz:transform(Parser, Fun)` runs `Parser`, then applies `Fun` to the
-parsed value on success. Errors pass through unchanged.
-
-```erlang
-zz:transform(zz:binary(), fun binary_to_atom/1).
-```
-
 ## Error format
 
 Errors are a list. Each entry is either a leaf atom (`not_atom`,

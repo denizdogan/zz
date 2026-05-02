@@ -36,7 +36,6 @@ path-addressed list of issues with `issues/1`.
     map/2,
     optional/1,
     parse/2,
-    transform/2,
     tuple/0,
     tuple/1,
     union/1
@@ -474,24 +473,6 @@ union_try([Z | Rest], Input, Errs) ->
     case Z(Input) of
         {ok, _} = Ok -> Ok;
         {error, E} -> union_try(Rest, Input, [E | Errs])
-    end.
-
--doc """
-Run `Z`, then apply `Fun` to the parsed value on success. Errors pass
-through unchanged.
-
-```erlang
-ToAtom = zz:transform(zz:binary(), fun binary_to_atom/1),
-{ok, hello} = zz:parse(ToAtom, <<"hello">>).
-```
-""".
--spec transform(parser(T), fun((T) -> U)) -> parser(U).
-transform(Z, Fun) ->
-    fun(Input) ->
-        case Z(Input) of
-            {ok, V} -> {ok, Fun(V)};
-            {error, _} = Err -> Err
-        end
     end.
 
 -doc """

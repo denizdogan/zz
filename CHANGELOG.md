@@ -14,13 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `no_match` issues carry `branches` (one nested issue list per union
   branch).
 - New exported types: `issue/0`, `issues/0`, `path/0`.
-- `zz:transform/2` runs a parser then applies a function to the
-  parsed value on success; errors pass through unchanged.
 - `parser/1` and `optional_parser/1` types are now parameterized over
-  the parsed value type, so `transform/2` and friends type-check
-  precisely (e.g. `zz:transform(zz:binary(), fun binary_to_atom/1)`).
+  the parsed value type, so `zz:parse/2` reports the precise output
+  type (e.g. `parse(zz:integer(), X) -> result(integer())`).
   `parser/0` and `optional_parser/0` remain as `parser(term())` /
-  `optional_parser(term())` aliases.
+  `optional_parser(term())` aliases for back-compat.
 
 ## [0.1.0] - 2026-05-02
 
