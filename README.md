@@ -266,10 +266,6 @@ $ mise check      # everything: fmt, eunit, proper, dialyzer, eqwalizer
 $ mise docs
 ```
 
-```console
-$ git config --local blame.ignoreRevsFile .git-blame-ignore-revs
-```
-
 ## License
 
 [Apache-2.0](LICENSE.md)
