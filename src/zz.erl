@@ -3,8 +3,8 @@
 -moduledoc """
 Zod-like parsing and validation for Erlang.
 
-Each combinator returns a `t:parser/0` — a function from input to a
-`t:result/1`. Compose them, then run with `parse/2`:
+Each combinator returns a `t:parser/1` (or `t:optional_parser/1` from
+`optional/1`). Compose them, then run with `parse/2`:
 
 ```erlang
 Z = zz:map(#{name => zz:binary(), age => zz:integer(#{min => 0})}),
