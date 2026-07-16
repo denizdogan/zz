@@ -35,7 +35,7 @@ jobs:
           rebar3-version: ${{ env.REBAR3_VERSION }}
 
       - name: Cache _build
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: _build
           key: ${{ runner.os }}-otp${{ matrix.otp }}-build-${{ hashFiles('rebar.lock', 'rebar.config') }}
@@ -43,7 +43,7 @@ jobs:
             ${{ runner.os }}-otp${{ matrix.otp }}-build-
 
       - name: Cache dialyzer PLT
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.cache/rebar3
           key: ${{ runner.os }}-otp${{ matrix.otp }}-plt-${{ hashFiles('rebar.config') }}
