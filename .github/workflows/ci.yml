@@ -7,24 +7,20 @@ on:
     branches: [main]
 
 env:
-  ELP_VERSION: "2026-02-27"
-  REBAR3_VERSION: "3.24.0"
+  ELP_VERSION: "2026-06-10"
+  REBAR3_VERSION: "3.27.0"
 
 jobs:
   test:
     name: OTP ${{ matrix.otp }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       id-token: write
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - otp: "27"
-            elp_otp: "27.3"
-          - otp: "28"
-            elp_otp: "28"
+        otp: ["27", "28", "29"]
 
     steps:
       - uses: actions/checkout@v7
@@ -35,6 +31,7 @@ jobs:
           rebar3-version: ${{ env.REBAR3_VERSION }}
 
       - name: Cache _build
+        if: ${{ !env.ACT }}
         uses: actions/cache@v6
         with:
           path: _build
@@ -43,6 +40,7 @@ jobs:
             ${{ runner.os }}-otp${{ matrix.otp }}-build-
 
       - name: Cache dialyzer PLT
+        if: ${{ !env.ACT }}
         uses: actions/cache@v6
         with:
           path: ~/.cache/rebar3
@@ -66,7 +64,7 @@ jobs:
         run: rebar3 as test do cover --verbose, codecov analyze
 
       - name: Upload coverage to Codecov
-        if: matrix.otp == '28'
+        if: matrix.otp == '29' && !env.ACT
         uses: codecov/codecov-action@v7
         with:
           files: codecov.json
@@ -76,12 +74,18 @@ jobs:
       - name: Dialyzer
         run: rebar3 dialyzer
 
+      # ELP 2026-06-10 has no OTP 29 artifact, and Eqwalizer currently fails
+      # against OTP 29-generated stdlib artifacts. Track upstream support:
+      # https://github.com/WhatsApp/erlang-language-platform/issues/214
       - name: Install elp
+        if: matrix.otp == '28'
         run: |
+          ELP_ARCH=$(uname -m)
           curl -fsSL -o /tmp/elp.tar.gz \
-            "https://github.com/WhatsApp/erlang-language-platform/releases/download/${ELP_VERSION}/elp-linux-x86_64-unknown-linux-gnu-otp-${{ matrix.elp_otp }}.tar.gz"
+            "https://github.com/WhatsApp/erlang-language-platform/releases/download/${ELP_VERSION}/elp-linux-${ELP_ARCH}-unknown-linux-gnu-otp-${{ matrix.otp }}.tar.gz"
           tar xzf /tmp/elp.tar.gz -C /usr/local/bin
           elp version
 
       - name: Eqwalizer
+        if: matrix.otp == '28'
         run: elp eqwalize-all

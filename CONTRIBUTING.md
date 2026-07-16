@@ -24,10 +24,21 @@ $ mise dialyzer       # static analysis
 $ mise eq-all         # eqwalizer (requires elp)
 $ mise format         # apply erlfmt
 $ mise check          # everything above, in sequence
+$ mise ci-local       # validate workflows + run all CI versions in Docker
 ```
 
 Run `mise check` before opening a pull request. CI runs the same
-checks on OTP 27 and 28.
+checks on OTP 27, 28, and 29.
+
+To exercise the GitHub Actions workflow itself, start Docker and run
+`mise ci-local`. This uses [`act`](https://nektosact.com/) to run the full
+OTP 27–29 matrix in Linux containers. Compilation, tests, coverage, and
+Dialyzer run on every version; Eqwalizer runs once on OTP 28 because ELP does
+not publish an OTP 29 runtime build and does not yet support OTP 29-generated
+stdlib artifacts ([upstream issue #214](https://github.com/WhatsApp/erlang-language-platform/issues/214)). GitHub cache operations and Codecov are
+skipped locally because their backing services are unavailable outside
+Actions. The complete matrix is considerably slower and uses more disk space
+than `mise check`.
 
 ## Conventions
 
