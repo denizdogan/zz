@@ -1,0 +1,23 @@
+{
+  "languages": {
+    "Erlang": {
+      "language_servers": ["elp", "!erlang-ls"]
+    }
+  },
+  "lsp": {
+    "elp": {
+      "binary": {
+        "path": "mise",
+        "arguments": [
+          "exec",
+          "--",
+          "env",
+          "-u",
+          "ELP_EQWALIZER_PATH",
+          "elp",
+          "server"
+        ]
+      }
+    }
+  }
+}
