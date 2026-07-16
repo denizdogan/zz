@@ -42,10 +42,10 @@ bad_key_test() ->
 
 bad_key_and_bad_value_test() ->
     Z = zz:map_of(zz:binary(), zz:integer()),
-    %% Both keys are non-binary (key error); values vary.
+    %% Both keys are non-binary, and the value under foo is not an integer.
     {error, Errs} = zz:parse(Z, #{1 => 2, foo => bar}),
     %% Map ordering is not guaranteed; check by membership.
-    ?assertEqual(2, length(Errs)),
+    ?assertEqual(3, length(Errs)),
     true = lists:any(
         fun
             ({map_key, 1, [not_binary]}) -> true;
@@ -56,6 +56,13 @@ bad_key_and_bad_value_test() ->
     true = lists:any(
         fun
             ({map_key, foo, [not_binary]}) -> true;
+            (_) -> false
+        end,
+        Errs
+    ),
+    true = lists:any(
+        fun
+            ({map_value, foo, [not_integer]}) -> true;
             (_) -> false
         end,
         Errs
@@ -100,6 +107,14 @@ key_collision_overwrite_test() ->
     Z = zz:map_of(KeyParser, zz:integer(), #{on_collision => overwrite}),
     {ok, #{same := Value}} = zz:parse(Z, #{a => 1, b => 2}),
     true = Value =:= 1 orelse Value =:= 2.
+
+key_collision_with_bad_value_test() ->
+    KeyParser = fun(_Key) -> {ok, same} end,
+    Z = zz:map_of(KeyParser, zz:integer()),
+    {error, Errs} = zz:parse(Z, #{a => bad, b => 1}),
+    ?assertEqual(2, length(Errs)),
+    ?assert(lists:member({map_key_collision, same}, Errs)),
+    ?assert(lists:member({map_value, a, [not_integer]}, Errs)).
 
 key_collision_issues_test() ->
     KeyParser = fun(_Key) -> {ok, same} end,

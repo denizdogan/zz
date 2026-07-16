@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `map_of/2,3` now validates values even when their keys fail and reports
+  transformed-key collisions independently of value validation.
+- `list/2` now reports both length errors when contradictory `min` and `max`
+  constraints are simultaneously violated.
+- Documented the `{map_key_collision, ParsedKey}` error shape.
+- Corrected the UTF-8 binary test fixture so non-Latin-1 characters are encoded
+  rather than truncated.
+
 ## [0.2.1] - 2026-05-02
 
 ### Changed

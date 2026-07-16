@@ -313,6 +313,7 @@ nested structure:
 {tuple, Index, InnerErrors}
 {map_value, Key, InnerErrors}
 {map_key, Key, InnerErrors}
+{map_key_collision, ParsedKey}
 {map_missing, Key}
 {unknown_keys, [Key]}
 {no_match, [Errors1, Errors2, ...]}

@@ -81,6 +81,11 @@ min_max_combined_test() ->
     ?assertEqual({ok, [1, 2, 3]}, zz:parse(Z, [1, 2, 3])),
     ?assertEqual({error, [list_too_long]}, zz:parse(Z, [1, 2, 3, 4])).
 
+contradictory_bounds_accumulate_test() ->
+    Z = zz:list(zz:integer(), #{min => 5, max => 3}),
+    {error, Errs} = zz:parse(Z, [1, 2, 3, 4]),
+    ?assertEqual([list_too_long, list_too_short], lists:sort(Errs)).
+
 max_with_invalid_elements_test() ->
     Z = zz:list(zz:integer(), #{max => 5}),
     ?assertEqual(

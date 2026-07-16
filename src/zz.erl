@@ -478,12 +478,18 @@ list(Z, Options) ->
         (Input) when is_list(Input) ->
             case list_length(Input) of
                 {ok, Len} ->
-                    if
-                        is_integer(Max), Len > Max ->
-                            {error, [list_too_long]};
-                        is_integer(Min), Len < Min ->
-                            {error, [list_too_short]};
-                        true ->
+                    Errs0 =
+                        if
+                            is_integer(Min), Len < Min -> [list_too_short];
+                            true -> []
+                        end,
+                    Errs1 =
+                        if
+                            is_integer(Max), Len > Max -> [list_too_long | Errs0];
+                            true -> Errs0
+                        end,
+                    case Errs1 of
+                        [] ->
                             {_, O1, E1} =
                                 lists:foldl(
                                     fun(I, {N, Os, Es}) ->
@@ -500,7 +506,9 @@ list(Z, Options) ->
                             case E1 of
                                 [] -> {ok, lists:reverse(O1)};
                                 _ -> {error, lists:reverse(E1)}
-                            end
+                            end;
+                        _ ->
+                            {error, Errs1}
                     end;
                 error ->
                     {error, [not_list]}
@@ -633,24 +641,44 @@ map_of(KZ, VZ, Options) ->
     OnCollision = maps:get(on_collision, Options, error),
     fun
         (Input) when is_map(Input) ->
-            {Out, Errs} =
+            {Out, _Seen, Errs} =
                 maps:fold(
-                    fun(K, V, {Os, Es}) ->
-                        case KZ(K) of
+                    fun(K, V, {Os, Seen, Es}) ->
+                        KeyResult = KZ(K),
+                        ValueResult = VZ(V),
+                        case KeyResult of
                             {ok, K2} ->
-                                case VZ(V) of
-                                    {ok, _V2} when OnCollision =:= error, is_map_key(K2, Os) ->
-                                        {Os, [{map_key_collision, K2} | Es]};
-                                    {ok, V2} ->
-                                        {Os#{K2 => V2}, Es};
-                                    {error, E} ->
-                                        {Os, [{map_value, K, E} | Es]}
+                                Collision =
+                                    OnCollision =:= error andalso is_map_key(K2, Seen),
+                                Seen2 = Seen#{K2 => true},
+                                case {Collision, ValueResult} of
+                                    {true, {ok, _V2}} ->
+                                        {Os, Seen2, [{map_key_collision, K2} | Es]};
+                                    {true, {error, ValueErrors}} ->
+                                        {Os, Seen2, [
+                                            {map_value, K, ValueErrors},
+                                            {map_key_collision, K2}
+                                            | Es
+                                        ]};
+                                    {false, {ok, V2}} ->
+                                        {Os#{K2 => V2}, Seen2, Es};
+                                    {false, {error, ValueErrors}} ->
+                                        {Os, Seen2, [{map_value, K, ValueErrors} | Es]}
                                 end;
-                            {error, E} ->
-                                {Os, [{map_key, K, E} | Es]}
+                            {error, KeyErrors} ->
+                                case ValueResult of
+                                    {ok, _V2} ->
+                                        {Os, Seen, [{map_key, K, KeyErrors} | Es]};
+                                    {error, ValueErrors} ->
+                                        {Os, Seen, [
+                                            {map_value, K, ValueErrors},
+                                            {map_key, K, KeyErrors}
+                                            | Es
+                                        ]}
+                                end
                         end
                     end,
-                    {#{}, []},
+                    {#{}, #{}, []},
                     Input
                 ),
             case Errs of
