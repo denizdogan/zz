@@ -117,7 +117,7 @@ human-readable binary with `format_issues/1`.
 -type binary_options() :: #{
     min => non_neg_integer(),
     max => non_neg_integer(),
-    regex => iodata()
+    regex => iodata() | re:mp()
 }.
 -type bitstring_options() :: #{min => non_neg_integer(), max => non_neg_integer()}.
 -type integer_options() :: #{min => integer(), max => integer()}.
@@ -160,7 +160,7 @@ Validate that input is a binary, with optional `min`/`max` byte size and
 binary(Options) ->
     Min = maps:get(min, Options, undefined),
     Max = maps:get(max, Options, undefined),
-    Regex = maps:get(regex, Options, undefined),
+    Regex = compile_regex(maps:get(regex, Options, undefined)),
     fun
         (Input) when is_binary(Input) ->
             Sz = byte_size(Input),
@@ -190,6 +190,19 @@ binary(Options) ->
             end;
         (_Invalid) ->
             {error, [not_binary]}
+    end.
+
+compile_regex(undefined) ->
+    undefined;
+compile_regex(Regex) ->
+    try re:inspect(Regex, namelist) of
+        {namelist, _} -> Regex
+    catch
+        error:badarg ->
+            case re:compile(Regex) of
+                {ok, Compiled} -> Compiled;
+                {error, Reason} -> error({invalid_regex, Reason})
+            end
     end.
 
 -doc #{equiv => bitstring / 1}.

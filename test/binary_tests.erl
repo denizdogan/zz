@@ -41,6 +41,13 @@ regex_mismatch_test() ->
         zz:parse(zz:binary(#{regex => ".*f.*"}), <<"abc">>)
     ).
 
+compiled_regex_test() ->
+    {ok, Regex} = re:compile("^abc"),
+    ?Z_OK(zz:binary(#{regex => Regex}), <<"abcdef">>).
+
+invalid_regex_fails_at_construction_test() ->
+    ?assertError({invalid_regex, _}, zz:binary(#{regex => <<"(">>})).
+
 max_zero_allows_empty_test() ->
     Z = zz:binary(#{max => 0}),
     ?Z_OK(Z, <<>>),

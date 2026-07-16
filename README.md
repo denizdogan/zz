@@ -72,7 +72,9 @@ zz:binary(#{min => Min, max => Max, regex => Pattern}).
 
 Errors: `not_binary`, `binary_too_short`, `binary_too_long`,
 `regex_mismatch`. `min` and `max` measure `byte_size/1`. `regex` accepts
-any `re:run/2`-compatible pattern.
+an iodata pattern or compiled `re:mp()`. Source patterns are compiled
+when the parser is constructed; malformed patterns raise
+`error:{invalid_regex, Reason}` at construction time.
 
 ### Bitstrings
 
