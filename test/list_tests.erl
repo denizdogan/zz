@@ -1,5 +1,8 @@
 -module(list_tests).
 
+-eqwalizer({nowarn_function, improper_list/0}).
+-eqwalizer({nowarn_function, long_improper_list/0}).
+
 -include("test.hrl").
 
 %%%===========================================================================
@@ -13,7 +16,7 @@ mixed_list_test() ->
     ?Z_OK(zz:list(), [<<"foo">>, bar, 3]).
 
 improper_list_passthrough_rejected_test() ->
-    ?assertEqual({error, [not_list]}, zz:parse(zz:list(), [1 | tail])).
+    ?assertEqual({error, [not_list]}, zz:parse(zz:list(), improper_list())).
 
 non_list_input_test() ->
     ?assertEqual({error, [not_list]}, zz:parse(zz:list(zz:integer()), <<"foo">>)).
@@ -32,7 +35,7 @@ multi_homogeneous_list_test() ->
     ?Z_OK(zz:list(zz:integer()), [1, 2, 3]).
 
 improper_homogeneous_list_rejected_test() ->
-    ?assertEqual({error, [not_list]}, zz:parse(zz:list(zz:integer()), [1 | tail])).
+    ?assertEqual({error, [not_list]}, zz:parse(zz:list(zz:integer()), improper_list())).
 
 homogeneous_element_errors_test() ->
     ?assertEqual(
@@ -83,5 +86,13 @@ max_with_invalid_elements_test() ->
 
 improper_list_with_options_rejected_test() ->
     Z = zz:list(zz:integer(), #{min => 1, max => 3}),
-    ?assertEqual({error, [not_list]}, zz:parse(Z, [1 | tail])),
-    ?assertEqual({error, [not_list]}, zz:parse(Z, [1, 2, 3, 4 | tail])).
+    ?assertEqual({error, [not_list]}, zz:parse(Z, improper_list())),
+    ?assertEqual({error, [not_list]}, zz:parse(Z, long_improper_list())).
+
+-spec improper_list() -> term().
+improper_list() ->
+    [1 | tail].
+
+-spec long_improper_list() -> term().
+long_improper_list() ->
+    [1, 2, 3, 4 | tail].

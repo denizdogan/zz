@@ -1,5 +1,7 @@
 -module(char_list_tests).
 
+-eqwalizer({nowarn_function, improper_char_list/0}).
+
 -include("test.hrl").
 
 empty_char_list_test() ->
@@ -15,7 +17,11 @@ non_list_input_test() ->
     ?assertEqual({error, [not_list]}, zz:parse(zz:char_list(), <<"hello">>)).
 
 improper_char_list_rejected_test() ->
-    ?assertEqual({error, [not_list]}, zz:parse(zz:char_list(), [$a | tail])).
+    ?assertEqual({error, [not_list]}, zz:parse(zz:char_list(), improper_char_list())).
+
+-spec improper_char_list() -> term().
+improper_char_list() ->
+    [$a | tail].
 
 bad_element_test() ->
     ?assertEqual(

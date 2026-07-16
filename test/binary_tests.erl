@@ -1,5 +1,7 @@
 -module(binary_tests).
 
+-eqwalizer({nowarn_function, unicode_regex_with_invalid_utf8_returns_mismatch_test/0}).
+
 -include("test.hrl").
 
 empty_binary_test() ->
