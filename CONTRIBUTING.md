@@ -14,6 +14,12 @@ Required tools:
 - [`elp`](https://github.com/WhatsApp/erlang-language-platform) for
   Eqwalizer checks (managed via Mise)
 
+Tool versions are pinned in `mise.toml`, with resolved artifacts and checksums
+in `mise.lock`. After changing a tool version, run `mise lock` and commit both
+files. Rebar plugins are pinned explicitly because Rebar does not include
+plugins in `rebar.lock`. Review `eqwalizer_support` compatibility when
+upgrading ELP.
+
 ## Workflow
 
 ```console
