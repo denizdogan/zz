@@ -899,6 +899,8 @@ format_path([]) ->
 format_path(Segs) ->
     lists:join($., [format_seg(S) || S <- Segs]).
 
+%% Atom and binary path segments are intentionally rendered verbatim. The
+%% formatter favors readable output over escaping arbitrary map keys.
 format_seg(S) when is_atom(S) -> atom_to_binary(S);
 format_seg(S) when is_integer(S) -> integer_to_binary(S);
 format_seg(S) when is_binary(S) -> S;
