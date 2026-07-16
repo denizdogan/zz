@@ -1,5 +1,7 @@
 -module(map_tests).
 
+-eqwalizer({nowarn_function, invalid_unknown_keys_mode_fails_at_construction_test/0}).
+
 -include("test.hrl").
 
 empty_map_passthrough_test() ->
@@ -52,6 +54,9 @@ strict_accepts_map_without_unknown_keys_test() ->
 unknown_keys_passthrough_test() ->
     Z = zz:map(#{}, #{unknown_keys => passthrough}),
     ?assertEqual({ok, #{foo => 1}}, zz:parse(Z, #{foo => 1})).
+
+invalid_unknown_keys_mode_fails_at_construction_test() ->
+    ?assertError(badarg, zz:map(#{}, #{unknown_keys => typo})).
 
 schema_value_mismatch_test() ->
     ?assertEqual(

@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `zz:map/2` with `unknown_keys => strict` no longer reports
   `{unknown_keys, []}` when the input contains no unknown keys.
+- `zz:map/2` and `zz:map_of/3` now raise `badarg` at parser construction for
+  invalid `unknown_keys` and `on_collision` values instead of failing later or
+  silently allowing transformed-key collisions.
 - `zz:issues/1` now preserves enclosing paths inside nested union branch
   issues.
 - `zz:list/0,1,2` and `zz:char_list/0` now reject improper lists with

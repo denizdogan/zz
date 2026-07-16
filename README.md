@@ -181,6 +181,8 @@ zz:map(#{
 - `passthrough` (default for `map/0`) — keep unknown keys in output.
 - `strict` — emit `{unknown_keys, [Key]}` error.
 
+Invalid `unknown_keys` values raise `badarg` when the parser is constructed.
+
 Errors: `not_map`, `{map_missing, Key}`, `{map_value, Key, InnerErrors}`,
 `{unknown_keys, [Key]}`.
 
@@ -203,7 +205,8 @@ zz:map_of(KeyParser, ValueParser, #{on_collision => overwrite}).
 ```
 
 Because Erlang map iteration order is unspecified, which colliding value
-survives in `overwrite` mode is also unspecified.
+survives in `overwrite` mode is also unspecified. Invalid `on_collision`
+values raise `badarg` when the parser is constructed.
 
 ### Literals
 

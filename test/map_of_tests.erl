@@ -1,5 +1,7 @@
 -module(map_of_tests).
 
+-eqwalizer({nowarn_function, invalid_collision_policy_fails_at_construction_test/0}).
+
 -include("test.hrl").
 
 empty_map_test() ->
@@ -107,6 +109,12 @@ key_collision_overwrite_test() ->
     Z = zz:map_of(KeyParser, zz:integer(), #{on_collision => overwrite}),
     {ok, #{same := Value}} = zz:parse(Z, #{a => 1, b => 2}),
     true = Value =:= 1 orelse Value =:= 2.
+
+invalid_collision_policy_fails_at_construction_test() ->
+    ?assertError(
+        badarg,
+        zz:map_of(zz:atom(), zz:integer(), #{on_collision => typo})
+    ).
 
 key_collision_with_bad_value_test() ->
     KeyParser = fun(_Key) -> {ok, same} end,

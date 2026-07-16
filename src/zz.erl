@@ -554,11 +554,17 @@ map(Schema) ->
 -doc """
 Validate a map against `Schema`. `unknown_keys` controls handling of keys
 not in `Schema`: `strip` (drop, default), `passthrough` (keep), `strict`
-(error).
+(error). Invalid values raise `badarg` when the parser is constructed.
 """.
 -spec map(schema(), map_options()) -> parser(#{term() => term()}).
 map(Schema, Options) ->
-    Mode = maps:get(unknown_keys, Options, strip),
+    Mode =
+        case maps:get(unknown_keys, Options, strip) of
+            strip -> strip;
+            passthrough -> passthrough;
+            strict -> strict;
+            _Invalid -> erlang:error(badarg)
+        end,
     fun
         (Input) when is_map(Input) ->
             {Output1, RemainingMap, Errors1} =
@@ -634,11 +640,17 @@ map_of(KZ, VZ) ->
 -doc """
 Like `map_of/2`, with an `on_collision` policy for distinct input keys
 that parse to the same output key. The default is `error`; `overwrite`
-keeps whichever value is visited last by the map iterator.
+keeps whichever value is visited last by the map iterator. Invalid values
+raise `badarg` when the parser is constructed.
 """.
 -spec map_of(parser(K), parser(V), map_of_options()) -> parser(#{K => V}).
 map_of(KZ, VZ, Options) ->
-    OnCollision = maps:get(on_collision, Options, error),
+    OnCollision =
+        case maps:get(on_collision, Options, error) of
+            error -> error;
+            overwrite -> overwrite;
+            _Invalid -> erlang:error(badarg)
+        end,
     fun
         (Input) when is_map(Input) ->
             {Out, _Seen, Errs} =
