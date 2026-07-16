@@ -52,18 +52,79 @@ actionlint && act pull_request \
 """
 
 [tasks.publish]
-description = "Publish to Hex and tag the release"
+description = "Validate, tag, and publish the release"
 run = """
-set -e
-git diff --quiet || { echo "Working tree dirty — commit or stash first."; exit 1; }
-git diff --cached --quiet || { echo "Staged changes uncommitted."; exit 1; }
+set -eu
+
+[ -z "$(git status --porcelain)" ] || {
+    echo "Working tree dirty — commit or stash all changes first."
+    exit 1
+}
+
+BRANCH=$(git branch --show-current)
+[ "$BRANCH" = "main" ] || {
+    echo "Releases must be published from main, not $BRANCH."
+    exit 1
+}
+
+UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)
+[ "$UPSTREAM" = "origin/main" ] || {
+    echo "main must track origin/main; found ${UPSTREAM:-no upstream}."
+    exit 1
+}
+
+git fetch --quiet origin main --tags
+HEAD=$(git rev-parse HEAD)
+REMOTE_HEAD=$(git rev-parse origin/main)
+[ "$HEAD" = "$REMOTE_HEAD" ] || {
+    echo "Local main must be synchronized with origin/main."
+    exit 1
+}
+
 VERSION=$(awk -F'"' '/vsn,/ {print $2}' src/zz.app.src)
-[ -n "$VERSION" ] || { echo "Could not read vsn from src/zz.app.src"; exit 1; }
-echo "Publishing zz $VERSION..."
-rebar3 hex publish
-git tag "v$VERSION"
-git push origin "v$VERSION"
-echo "Released v$VERSION"
+[ -n "$VERSION" ] || {
+    echo "Could not read vsn from src/zz.app.src."
+    exit 1
+}
+TAG="v$VERSION"
+
+grep -Fq "{zz, \"$VERSION\"}" README.md || {
+    echo "README.md does not reference zz $VERSION."
+    exit 1
+}
+grep -Fq "## [$VERSION] -" CHANGELOG.md || {
+    echo "CHANGELOG.md has no release heading for $VERSION."
+    exit 1
+}
+grep -Fq "[$VERSION]:" CHANGELOG.md || {
+    echo "CHANGELOG.md has no link for $VERSION."
+    exit 1
+}
+
+if git rev-parse --verify --quiet "refs/tags/$TAG" >/dev/null; then
+    echo "Local tag $TAG already exists."
+    exit 1
+fi
+if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+    echo "Remote tag $TAG already exists."
+    exit 1
+fi
+
+echo "Validating zz $VERSION..."
+mise check
+rebar3 hex build
+
+echo "Creating and pushing $TAG..."
+git tag "$TAG"
+git push origin "$TAG"
+
+echo "Publishing zz $VERSION to Hex..."
+if ! rebar3 hex publish; then
+    echo "Hex publish failed after $TAG was pushed; fix the issue and retry with rebar3 hex publish."
+    exit 1
+fi
+
+echo "Released $TAG"
 """
 
 [tasks.eq]

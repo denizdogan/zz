@@ -52,9 +52,12 @@ than `mise check`.
 
 ## Releasing (maintainers)
 
-1. Bump `vsn` in `src/zz.app.src` and convert the `[Unreleased]`
-   heading in `CHANGELOG.md` to the new version. Update the version
-   reference in `README.md`. Commit and push.
-2. Run `mise check` to confirm everything is green.
-3. Run `mise publish`. This publishes to Hex (requires
-   `rebar3 hex user auth` once), tags `vX.Y.Z`, and pushes the tag.
+1. Bump `vsn` in `src/zz.app.src`, move the current `[Unreleased]`
+   entries into a new version section while keeping an empty
+   `[Unreleased]` heading, and update the version in `README.md` and the
+   changelog links.
+2. Commit and push to `main`, then wait for CI to pass.
+3. Run `mise publish` (requires `rebar3 hex user auth` once). The task
+   verifies a clean, synchronized `main`, checks version consistency and
+   tag availability, runs the full validation suite, builds the package,
+   pushes the version tag, and publishes to Hex.
