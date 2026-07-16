@@ -7,15 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `zz:map_of/3` and exported `t:zz:map_of_options/0`; set
+  `on_collision => overwrite` to intentionally allow transformed-key
+  collisions.
+
+### Changed
+
+- `zz:map_of/2,3` now rejects transformed-key collisions by default with
+  `{map_key_collision, ParsedKey}` instead of silently overwriting an entry.
+  `zz:issues/1` exposes these as `map_key_collision` issues with
+  `key => ParsedKey`.
+- `zz:binary/1` now compiles source regex patterns when the parser is
+  constructed, accepts precompiled `re:mp()` patterns, and raises
+  `error:{invalid_regex, Reason}` for malformed patterns.
+
 ### Fixed
 
-- `map_of/2,3` now validates values even when their keys fail and reports
-  transformed-key collisions independently of value validation.
-- `list/2` now reports both length errors when contradictory `min` and `max`
-  constraints are simultaneously violated.
-- Documented the `{map_key_collision, ParsedKey}` error shape.
-- Corrected the UTF-8 binary test fixture so non-Latin-1 characters are encoded
-  rather than truncated.
+- `zz:map/2` with `unknown_keys => strict` no longer reports
+  `{unknown_keys, []}` when the input contains no unknown keys.
+- `zz:issues/1` now preserves enclosing paths inside nested union branch
+  issues.
+- `zz:list/0,1,2` and `zz:char_list/0` now reject improper lists with
+  `{error, [not_list]}` instead of accepting them or crashing.
+- `zz:binary/1` now returns `regex_mismatch` instead of crashing when a Unicode
+  regex receives invalid UTF-8 input.
+- `zz:map_of/2,3` now validates keys and values independently, accumulating
+  value failures alongside key-validation and transformed-key collision
+  failures.
+- `zz:list/2` now reports every violated length constraint, including both
+  `list_too_short` and `list_too_long` for contradictory bounds.
+
+### Tooling
+
+- Extended CI to OTP 29 and added `mise ci-local` to lint and run the OTP 27–29
+  workflow matrix with `act`.
+- Pinned Mise-managed tools and Rebar plugins, added `mise.lock`, and configured
+  Zed to use the managed ELP and Eqwalizer setup.
+- Hardened `mise publish` with clean and synchronized branch checks, release
+  metadata and tag validation, the full check suite, and a Hex package build
+  before tagging and publishing.
 
 ## [0.2.1] - 2026-05-02
 
