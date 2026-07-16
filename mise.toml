@@ -39,7 +39,7 @@ rebar3 fmt --check
 rebar3 as test do eunit
 rebar3 as test do proper
 rebar3 dialyzer
-elp eqwalize-all
+env -u ELP_EQWALIZER_PATH elp eqwalize-all
 """
 
 [tasks.ci-local]
@@ -67,10 +67,10 @@ echo "Released v$VERSION"
 """
 
 [tasks.eq]
-run = "elp eqwalize"
+run = "env -u ELP_EQWALIZER_PATH elp eqwalize"
 
 [tasks.eq-all]
-run = "elp eqwalize-all"
+run = "env -u ELP_EQWALIZER_PATH elp eqwalize-all"
 
 [tasks.erl]
 run = "rebar3 shell"
