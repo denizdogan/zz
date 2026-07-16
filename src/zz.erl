@@ -788,7 +788,7 @@ issue({no_match, Branches}, RevPath) ->
         #{
             path => lists:reverse(RevPath),
             code => no_match,
-            branches => [issues(B) || B <- Branches]
+            branches => [issues_at(B, RevPath) || B <- Branches]
         }
     ].
 

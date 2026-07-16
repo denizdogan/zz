@@ -92,6 +92,23 @@ no_match_test() ->
         zz:issues(Errs)
     ).
 
+nested_no_match_preserves_branch_paths_test() ->
+    Z = zz:map(#{field => zz:union([zz:integer(), zz:binary()])}),
+    {error, Errs} = zz:parse(Z, #{field => atom}),
+    ?assertEqual(
+        [
+            #{
+                path => [field],
+                code => no_match,
+                branches => [
+                    [#{path => [field], code => not_integer}],
+                    [#{path => [field], code => not_binary}]
+                ]
+            }
+        ],
+        zz:issues(Errs)
+    ).
+
 deeply_nested_test() ->
     Z = zz:map(#{
         users => zz:list(zz:map(#{name => zz:binary()}))
