@@ -11,7 +11,7 @@ ascii_binary_test() ->
     ?Z_OK(zz:binary(), <<"hello">>).
 
 utf8_binary_test() ->
-    ?Z_OK(zz:binary(), <<"åäö👍">>).
+    ?Z_OK(zz:binary(), <<"åäö👍"/utf8>>).
 
 string_input_is_not_binary_test() ->
     ?assertEqual({error, [not_binary]}, zz:parse(zz:binary(), "string")).
