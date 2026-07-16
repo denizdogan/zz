@@ -1,8 +1,9 @@
 [tools]
-erlang = "latest"
-rebar = "latest"
-act = "latest"
-actionlint = "latest"
+erlang = "28.5"
+rebar = "3.27.0"
+act = "0.2.89"
+actionlint = "1.7.12"
+"ubi:WhatsApp/erlang-language-platform" = { version = "2026-06-10", matching = "otp-28.tar.gz" }
 
 [tasks.compile]
 run = "rebar3 compile"

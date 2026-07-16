@@ -11,9 +11,8 @@ Required tools:
 
 - Erlang/OTP 27 or newer (managed via Mise)
 - rebar3 (managed via Mise)
-- [`elp`](https://github.com/WhatsApp/erlang-language-platform) on
-  `PATH` for eqwalizer checks (not managed by Mise; install from
-  releases)
+- [`elp`](https://github.com/WhatsApp/erlang-language-platform) for
+  Eqwalizer checks (managed via Mise)
 
 ## Workflow
 
@@ -21,7 +20,7 @@ Required tools:
 $ mise compile        # compile
 $ mise test           # eunit + proper
 $ mise dialyzer       # static analysis
-$ mise eq-all         # eqwalizer (requires elp)
+$ mise eq-all         # eqwalizer
 $ mise format         # apply erlfmt
 $ mise check          # everything above, in sequence
 $ mise ci-local       # validate workflows + run all CI versions in Docker
