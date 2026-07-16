@@ -45,6 +45,13 @@ compiled_regex_test() ->
     {ok, Regex} = re:compile("^abc"),
     ?Z_OK(zz:binary(#{regex => Regex}), <<"abcdef">>).
 
+unicode_regex_with_invalid_utf8_returns_mismatch_test() ->
+    {ok, Regex} = re:compile(<<".">>, [unicode]),
+    ?assertEqual(
+        {error, [regex_mismatch]},
+        zz:parse(zz:binary(#{regex => Regex}), <<255>>)
+    ).
+
 invalid_regex_fails_at_construction_test() ->
     ?assertError({invalid_regex, _}, zz:binary(#{regex => <<"(">>})).
 

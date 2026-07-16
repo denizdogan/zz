@@ -179,9 +179,11 @@ binary(Options) ->
                     undefined ->
                         Errs1;
                     _ ->
-                        case re:run(Input, Regex) of
+                        try re:run(Input, Regex) of
                             nomatch -> [regex_mismatch | Errs1];
                             _ -> Errs1
+                        catch
+                            error:badarg -> [regex_mismatch | Errs1]
                         end
                 end,
             case Errs2 of
