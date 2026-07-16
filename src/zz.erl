@@ -449,11 +449,11 @@ number() ->
 -doc "Validate that input is a list (any contents).".
 -spec list() -> parser([term()]).
 list() ->
-    fun
-        (Input) when is_list(Input) ->
-            {ok, Input};
-        (_Invalid) ->
-            {error, [not_list]}
+    fun(Input) ->
+        case list_length(Input) of
+            {ok, _Length} -> {ok, Input};
+            error -> {error, [not_list]}
+        end
     end.
 
 -doc #{equiv => list / 2}.
@@ -469,35 +469,45 @@ Validate a homogeneous list, parsing each element with `Z`. Optional
 list(Z, Options) ->
     Min = maps:get(min, Options, undefined),
     Max = maps:get(max, Options, undefined),
-    fun
-        (Input) when is_list(Input) ->
-            Len = length(Input),
-            if
-                is_integer(Max), Len > Max ->
-                    {error, [list_too_long]};
-                is_integer(Min), Len < Min ->
-                    {error, [list_too_short]};
-                true ->
-                    {_, O1, E1} =
-                        lists:foldl(
-                            fun(I, {N, Os, Es}) ->
-                                case Z(I) of
-                                    {ok, O} ->
-                                        {N + 1, [O | Os], Es};
-                                    {error, E} ->
-                                        {N + 1, Os, [{list, N, E} | Es]}
-                                end
-                            end,
-                            {1, [], []},
-                            Input
-                        ),
-                    case E1 of
-                        [] -> {ok, lists:reverse(O1)};
-                        _ -> {error, lists:reverse(E1)}
-                    end
-            end;
-        (_Invalid) ->
-            {error, [not_list]}
+    fun(Input) ->
+        case list_length(Input) of
+            {ok, Len} ->
+                if
+                    is_integer(Max), Len > Max ->
+                        {error, [list_too_long]};
+                    is_integer(Min), Len < Min ->
+                        {error, [list_too_short]};
+                    true ->
+                        {_, O1, E1} =
+                            lists:foldl(
+                                fun(I, {N, Os, Es}) ->
+                                    case Z(I) of
+                                        {ok, O} ->
+                                            {N + 1, [O | Os], Es};
+                                        {error, E} ->
+                                            {N + 1, Os, [{list, N, E} | Es]}
+                                    end
+                                end,
+                                {1, [], []},
+                                Input
+                            ),
+                        case E1 of
+                            [] -> {ok, lists:reverse(O1)};
+                            _ -> {error, lists:reverse(E1)}
+                        end
+                end;
+            error ->
+                {error, [not_list]}
+        end
+    end.
+
+%% is_list/1 accepts improper lists; length/1 verifies that the chain ends in [].
+-spec list_length(term()) -> {ok, non_neg_integer()} | error.
+list_length(Input) ->
+    try
+        {ok, length(Input)}
+    catch
+        error:badarg -> error
     end.
 
 -doc "Validate that input equals `Value` exactly (`=:=`).".

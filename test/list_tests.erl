@@ -12,6 +12,9 @@ empty_list_test() ->
 mixed_list_test() ->
     ?Z_OK(zz:list(), [<<"foo">>, bar, 3]).
 
+improper_list_passthrough_rejected_test() ->
+    ?assertEqual({error, [not_list]}, zz:parse(zz:list(), [1 | tail])).
+
 non_list_input_test() ->
     ?assertEqual({error, [not_list]}, zz:parse(zz:list(zz:integer()), <<"foo">>)).
 
@@ -27,6 +30,9 @@ singleton_homogeneous_list_test() ->
 
 multi_homogeneous_list_test() ->
     ?Z_OK(zz:list(zz:integer()), [1, 2, 3]).
+
+improper_homogeneous_list_rejected_test() ->
+    ?assertEqual({error, [not_list]}, zz:parse(zz:list(zz:integer()), [1 | tail])).
 
 homogeneous_element_errors_test() ->
     ?assertEqual(
@@ -74,3 +80,8 @@ max_with_invalid_elements_test() ->
         {error, [{list, 2, [not_integer]}]},
         zz:parse(Z, [1, foo, 3])
     ).
+
+improper_list_with_options_rejected_test() ->
+    Z = zz:list(zz:integer(), #{min => 1, max => 3}),
+    ?assertEqual({error, [not_list]}, zz:parse(Z, [1 | tail])),
+    ?assertEqual({error, [not_list]}, zz:parse(Z, [1, 2, 3, 4 | tail])).

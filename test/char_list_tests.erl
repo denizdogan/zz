@@ -14,6 +14,9 @@ unicode_char_list_test() ->
 non_list_input_test() ->
     ?assertEqual({error, [not_list]}, zz:parse(zz:char_list(), <<"hello">>)).
 
+improper_char_list_rejected_test() ->
+    ?assertEqual({error, [not_list]}, zz:parse(zz:char_list(), [$a | tail])).
+
 bad_element_test() ->
     ?assertEqual(
         {error, [{list, 2, [not_char]}]},
