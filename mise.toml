@@ -91,7 +91,7 @@ VERSION=$(awk -F'"' '/vsn,/ {print $2}' src/zz.app.src)
 }
 TAG="v$VERSION"
 
-grep -Fq "{zz, \"$VERSION\"}" README.md || {
+grep -Fq "{zz, \\\"$VERSION\\\"}" README.md || {
     echo "README.md does not reference zz $VERSION."
     exit 1
 }
