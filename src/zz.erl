@@ -57,6 +57,7 @@ human-readable binary with `format_issues/1`.
     map/1,
     map/2,
     map_of/2,
+    map_of/3,
     neg_integer/0,
     non_neg_integer/0,
     nullable/1,
@@ -87,6 +88,7 @@ human-readable binary with `format_issues/1`.
     float_options/0,
     list_options/0,
     map_options/0,
+    map_of_options/0,
     schema/0
 ]).
 
@@ -99,6 +101,7 @@ human-readable binary with `format_issues/1`.
     | {map_key, term(), errors()}
     | {map_value, term(), errors()}
     | {map_missing, term()}
+    | {map_key_collision, term()}
     | {unknown_keys, [term()]}
     | {no_match, [errors()]}.
 
@@ -121,6 +124,7 @@ human-readable binary with `format_issues/1`.
 -type float_options() :: #{min => float(), max => float()}.
 -type list_options() :: #{min => non_neg_integer(), max => non_neg_integer()}.
 -type map_options() :: #{unknown_keys => strip | passthrough | strict}.
+-type map_of_options() :: #{on_collision => error | overwrite}.
 -type schema() :: #{term() => parser() | optional_parser()}.
 
 -doc "Run parser `Z` against `Input`.".
@@ -586,6 +590,16 @@ zz:map_of(zz:binary(), zz:integer()).
 """.
 -spec map_of(parser(K), parser(V)) -> parser(#{K => V}).
 map_of(KZ, VZ) ->
+    map_of(KZ, VZ, #{}).
+
+-doc """
+Like `map_of/2`, with an `on_collision` policy for distinct input keys
+that parse to the same output key. The default is `error`; `overwrite`
+keeps whichever value is visited last by the map iterator.
+""".
+-spec map_of(parser(K), parser(V), map_of_options()) -> parser(#{K => V}).
+map_of(KZ, VZ, Options) ->
+    OnCollision = maps:get(on_collision, Options, error),
     fun
         (Input) when is_map(Input) ->
             {Out, Errs} =
@@ -594,6 +608,8 @@ map_of(KZ, VZ) ->
                         case KZ(K) of
                             {ok, K2} ->
                                 case VZ(V) of
+                                    {ok, _V2} when OnCollision =:= error, is_map_key(K2, Os) ->
+                                        {Os, [{map_key_collision, K2} | Es]};
                                     {ok, V2} ->
                                         {Os#{K2 => V2}, Es};
                                     {error, E} ->
@@ -781,6 +797,8 @@ issue({map_key, K, Es}, RevPath) ->
             errors => issues(Es)
         }
     ];
+issue({map_key_collision, K}, RevPath) ->
+    [#{path => lists:reverse(RevPath), code => map_key_collision, key => K}];
 issue({unknown_keys, Keys}, RevPath) ->
     [#{path => lists:reverse(RevPath), code => unknown_keys, keys => Keys}];
 issue({no_match, Branches}, RevPath) ->

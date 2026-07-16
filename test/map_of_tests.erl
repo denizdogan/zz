@@ -84,3 +84,26 @@ nested_in_schema_test() ->
     }),
     Input = #{counts => #{<<"a">> => 1, <<"b">> => 2}},
     ?assertEqual({ok, Input}, zz:parse(Z, Input)).
+
+key_collision_errors_by_default_test() ->
+    KeyParser = fun(_Key) -> {ok, same} end,
+    Z = zz:map_of(KeyParser, zz:integer()),
+    ?assertEqual(
+        {error, [{map_key_collision, same}]},
+        zz:parse(Z, #{a => 1, b => 2})
+    ).
+
+key_collision_overwrite_test() ->
+    KeyParser = fun(_Key) -> {ok, same} end,
+    Z = zz:map_of(KeyParser, zz:integer(), #{on_collision => overwrite}),
+    {ok, #{same := Value}} = zz:parse(Z, #{a => 1, b => 2}),
+    true = Value =:= 1 orelse Value =:= 2.
+
+key_collision_issues_test() ->
+    KeyParser = fun(_Key) -> {ok, same} end,
+    Z = zz:map_of(KeyParser, zz:integer()),
+    {error, Errs} = zz:parse(Z, #{a => 1, b => 2}),
+    ?assertEqual(
+        [#{path => [], code => map_key_collision, key => same}],
+        zz:issues(Errs)
+    ).

@@ -192,6 +192,17 @@ zz:map_of(zz:binary(), zz:integer()).
 Key errors are wrapped as `{map_key, OriginalKey, InnerErrors}`; value
 errors as `{map_value, OriginalKey, InnerErrors}`.
 
+If distinct input keys parse to the same output key, `map_of/2` returns
+`{map_key_collision, ParsedKey}` rather than silently losing an entry.
+Use `map_of/3` to allow overwriting intentionally:
+
+```erlang
+zz:map_of(KeyParser, ValueParser, #{on_collision => overwrite}).
+```
+
+Because Erlang map iteration order is unspecified, which colliding value
+survives in `overwrite` mode is also unspecified.
+
 ### Literals
 
 ```erlang
@@ -334,7 +345,7 @@ zz:issues(Errs).
 
 Useful for JSON serialization, logging, etc.
 
-> **Note:** Issue order for `map/1,2` and `map_of/2` follows the
+> **Note:** Issue order for `map/1,2` and `map_of/2,3` follows the
 > underlying map iteration order. Erlang does not guarantee a map
 > iteration order across OTP releases — the observable order has
 > changed as internal representations evolved, and `maps:keys/1` and
