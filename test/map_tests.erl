@@ -36,6 +36,10 @@ unknown_keys_strict_test() ->
     {error, [{unknown_keys, Keys}]} = zz:parse(Z, #{foo => 1, bar => 2}),
     ?assertEqual([bar, foo], lists:sort(Keys)).
 
+strict_accepts_map_without_unknown_keys_test() ->
+    Z = zz:map(#{foo => zz:integer()}, #{unknown_keys => strict}),
+    ?assertEqual({ok, #{foo => 1}}, zz:parse(Z, #{foo => 1})).
+
 unknown_keys_passthrough_test() ->
     Z = zz:map(#{}, #{unknown_keys => passthrough}),
     ?assertEqual({ok, #{foo => 1}}, zz:parse(Z, #{foo => 1})).

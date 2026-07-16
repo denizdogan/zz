@@ -556,6 +556,8 @@ map(Schema, Options) ->
                         {Output1, Errors1};
                     passthrough ->
                         {maps:merge(Output1, RemainingMap), Errors1};
+                    strict when map_size(RemainingMap) =:= 0 ->
+                        {Output1, Errors1};
                     strict ->
                         {Output1, [{unknown_keys, maps:keys(RemainingMap)} | Errors1]}
                 end,
