@@ -16,22 +16,19 @@ utf8_binary_test() ->
 string_input_is_not_binary_test() ->
     ?assertEqual({error, [not_binary]}, zz:parse(zz:binary(), "string")).
 
-min_satisfied_test() ->
-    ?Z_OK(zz:binary(#{min => 1}), <<"a">>).
+non_byte_aligned_bitstring_test() ->
+    ?assertEqual({error, [not_binary]}, zz:parse(zz:binary(), <<1:7>>)).
 
-min_violated_test() ->
+utf8_byte_count_boundaries_test() ->
+    Z = zz:binary(#{min => 4, max => 4}),
+    ?Z_OK(Z, <<16#1F44D/utf8>>),
     ?assertEqual(
         {error, [binary_too_short]},
-        zz:parse(zz:binary(#{min => 2}), <<"a">>)
-    ).
-
-max_satisfied_test() ->
-    ?Z_OK(zz:binary(#{max => 1}), <<"a">>).
-
-max_violated_test() ->
+        zz:parse(Z, <<16#20AC/utf8>>)
+    ),
     ?assertEqual(
         {error, [binary_too_long]},
-        zz:parse(zz:binary(#{max => 2}), <<"abc">>)
+        zz:parse(Z, <<16#1F44D/utf8, $!>>)
     ).
 
 regex_match_test() ->
@@ -61,12 +58,6 @@ max_zero_allows_empty_test() ->
     Z = zz:binary(#{max => 0}),
     ?Z_OK(Z, <<>>),
     ?assertEqual({error, [binary_too_long]}, zz:parse(Z, <<"a">>)).
-
-min_max_equal_test() ->
-    Z = zz:binary(#{min => 3, max => 3}),
-    ?Z_OK(Z, <<"abc">>),
-    ?assertEqual({error, [binary_too_short]}, zz:parse(Z, <<"ab">>)),
-    ?assertEqual({error, [binary_too_long]}, zz:parse(Z, <<"abcd">>)).
 
 combined_errors_test() ->
     Z = zz:binary(#{regex => <<".*a.*">>, min => 5}),

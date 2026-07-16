@@ -43,9 +43,14 @@ empty_tuple_schema_test() ->
 empty_schema_arity_mismatch_test() ->
     ?assertEqual({error, [arity_mismatch]}, zz:parse(zz:tuple({}), {1})).
 
-fixed_arity_match_test() ->
-    Z = zz:tuple({zz:integer(), zz:binary()}),
-    ?assertEqual({ok, {3, <<"foo">>}}, zz:parse(Z, {3, <<"foo">>})).
+fixed_arity_child_output_test() ->
+    First = fun(Value) -> {ok, {first, Value}} end,
+    Second = fun(Value) -> {ok, {second, Value}} end,
+    Z = zz:tuple({First, Second}),
+    ?assertEqual(
+        {ok, {{first, 3}, {second, <<"foo">>}}},
+        zz:parse(Z, {3, <<"foo">>})
+    ).
 
 fixed_arity_too_short_test() ->
     Z = zz:tuple({zz:integer(), zz:binary()}),

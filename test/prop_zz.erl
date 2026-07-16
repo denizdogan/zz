@@ -11,6 +11,9 @@
     end)
 ).
 
+prop_any_identity() ->
+    ?VALID(any(), zz:any()).
+
 prop_atom_ok() ->
     ?VALID(atom(), zz:atom()).
 
@@ -87,22 +90,6 @@ prop_tuple_invalid() ->
 prop_map_invalid() ->
     ?FORALL(
         X, not_map(), {error, [not_map]} =:= zz:parse(zz:map(), X)
-    ).
-
-prop_basic() ->
-    ?FORALL(
-        {Input, Z},
-        oneof([
-            {atom(), zz:atom()},
-            {binary(), zz:binary()},
-            {boolean(), zz:boolean()},
-            {integer(), zz:integer()},
-            {float(), zz:float()},
-            {list(), zz:list()},
-            {map(), zz:map()},
-            {tuple(), zz:tuple()}
-        ]),
-        {ok, Input} =:= zz:parse(Z, Input)
     ).
 
 prop_issues_total() ->

@@ -19,8 +19,8 @@ improper_list_with_binary_tail_test() ->
 binary_input_rejected_test() ->
     ?assertEqual({error, [not_iolist]}, zz:parse(zz:iolist(), <<"hello">>)).
 
-atom_test() ->
-    ?assertEqual({error, [not_iolist]}, zz:parse(zz:iolist(), foo)).
+non_byte_aligned_bitstring_test() ->
+    ?assertEqual({error, [not_iolist]}, zz:parse(zz:iolist(), <<1:7>>)).
 
 integer_test() ->
     ?assertEqual({error, [not_iolist]}, zz:parse(zz:iolist(), 1)).
@@ -31,5 +31,6 @@ negative_byte_test() ->
 byte_too_large_test() ->
     ?assertEqual({error, [not_iolist]}, zz:parse(zz:iolist(), [256])).
 
-list_with_atom_test() ->
-    ?assertEqual({error, [not_iolist]}, zz:parse(zz:iolist(), [foo])).
+deep_late_invalid_structure_test() ->
+    Input = [<<"valid">>, [0, [255, [<<"still valid">>, invalid]]]],
+    ?assertEqual({error, [not_iolist]}, zz:parse(zz:iolist(), Input)).

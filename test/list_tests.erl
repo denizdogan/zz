@@ -19,7 +19,7 @@ improper_list_passthrough_rejected_test() ->
     ?assertEqual({error, [not_list]}, zz:parse(zz:list(), improper_list())).
 
 non_list_input_test() ->
-    ?assertEqual({error, [not_list]}, zz:parse(zz:list(zz:integer()), <<"foo">>)).
+    ?assertEqual({error, [not_list]}, zz:parse(zz:list(), <<"foo">>)).
 
 %%%===========================================================================
 %%% list/1 — homogeneous list with element parser
@@ -31,8 +31,12 @@ empty_homogeneous_list_test() ->
 singleton_homogeneous_list_test() ->
     ?Z_OK(zz:list(zz:integer()), [1]).
 
-multi_homogeneous_list_test() ->
-    ?Z_OK(zz:list(zz:integer()), [1, 2, 3]).
+homogeneous_child_output_test() ->
+    Child = fun(Value) -> {ok, {parsed, Value}} end,
+    ?assertEqual(
+        {ok, [{parsed, 1}, {parsed, 2}, {parsed, 3}]},
+        zz:parse(zz:list(Child), [1, 2, 3])
+    ).
 
 improper_homogeneous_list_rejected_test() ->
     ?assertEqual({error, [not_list]}, zz:parse(zz:list(zz:integer()), improper_list())).

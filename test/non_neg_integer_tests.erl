@@ -14,8 +14,8 @@ negative_test() ->
         zz:parse(zz:non_neg_integer(), -1)
     ).
 
-atom_test() ->
+positive_float_test() ->
     ?assertEqual(
         {error, [not_non_neg_integer]},
-        zz:parse(zz:non_neg_integer(), foo)
+        zz:parse(zz:non_neg_integer(), 1.0)
     ).

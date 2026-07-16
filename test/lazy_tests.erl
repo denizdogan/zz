@@ -57,9 +57,13 @@ bad_node_inner_test() ->
         zz:parse(tree(), {node, leaf, banana})
     ).
 
-non_recursive_lazy_test() ->
-    Z = zz:lazy(fun() -> zz:integer() end),
-    ?assertEqual({ok, 1}, zz:parse(Z, 1)),
+non_recursive_lazy_transformed_output_test() ->
+    Inner = fun
+        (Input) when is_integer(Input) -> {ok, {integer, Input}};
+        (_Input) -> {error, [not_integer]}
+    end,
+    Z = zz:lazy(fun() -> Inner end),
+    ?assertEqual({ok, {integer, 1}}, zz:parse(Z, 1)),
     ?assertEqual({error, [not_integer]}, zz:parse(Z, foo)).
 
 list_of_trees_test() ->

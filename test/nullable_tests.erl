@@ -2,13 +2,11 @@
 
 -include("test.hrl").
 
-undefined_test() ->
-    Z = zz:nullable(zz:integer()),
-    ?assertEqual({ok, undefined}, zz:parse(Z, undefined)).
-
-inner_match_test() ->
-    Z = zz:nullable(zz:integer()),
-    ?assertEqual({ok, 42}, zz:parse(Z, 42)).
+undefined_precedence_and_transformed_inner_value_test() ->
+    Inner = fun(Value) -> {ok, {inner, Value}} end,
+    Z = zz:nullable(Inner),
+    ?assertEqual({ok, undefined}, zz:parse(Z, undefined)),
+    ?assertEqual({ok, {inner, 42}}, zz:parse(Z, 42)).
 
 inner_mismatch_test() ->
     Z = zz:nullable(zz:integer()),

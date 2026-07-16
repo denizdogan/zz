@@ -8,8 +8,17 @@ empty_map_passthrough_test() ->
 populated_map_passthrough_test() ->
     ?Z_OK(zz:map(), #{foo => 1}).
 
-schema_with_integer_test() ->
-    ?Z_OK(zz:map(#{foo => zz:integer()}), #{foo => 1}).
+transformed_required_and_optional_values_with_passthrough_test() ->
+    Required = fun(Value) -> {ok, {required, Value}} end,
+    Optional = fun(Value) -> {ok, {optional, Value}} end,
+    Z = zz:map(
+        #{foo => Required, bar => zz:optional(Optional)},
+        #{unknown_keys => passthrough}
+    ),
+    ?assertEqual(
+        {ok, #{foo => {required, 1}, bar => {optional, 2}, extra => untouched}},
+        zz:parse(Z, #{foo => 1, bar => 2, extra => untouched})
+    ).
 
 schema_with_literal_test() ->
     ?Z_OK(zz:map(#{foo => zz:literal(1)}), #{foo => 1}).

@@ -47,8 +47,7 @@ unusual_path_segment_test() ->
     %% Path segments are arbitrary terms (map keys can be anything).
     %% Tuple/float/list segments fall through to the io_lib:format clause.
     Issues = [#{path => [{a, b}], code => not_integer}],
-    Output = zz:format_issues(Issues),
-    true = binary:match(Output, <<"{a,b}: not_integer">>) =/= nomatch.
+    ?assertEqual(<<"{a,b}: not_integer\n">>, zz:format_issues(Issues)).
 
 end_to_end_via_issues_test() ->
     Z = zz:map(#{
@@ -57,6 +56,9 @@ end_to_end_via_issues_test() ->
     }),
     {error, Errs} = zz:parse(Z, #{name => 1, age => -1}),
     Output = zz:format_issues(zz:issues(Errs)),
-    %% Order is map-iteration-defined; check both lines are present.
-    true = binary:match(Output, <<"name: not_binary">>) =/= nomatch,
-    true = binary:match(Output, <<"age: integer_too_small">>) =/= nomatch.
+    %% Normalize map-defined issue order while retaining exact lines and cardinality.
+    Lines = binary:split(Output, <<"\n">>, [global, trim_all]),
+    ?assertEqual(
+        [<<"age: integer_too_small">>, <<"name: not_binary">>],
+        lists:sort(Lines)
+    ).

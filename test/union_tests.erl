@@ -5,11 +5,18 @@
 single_branch_match_test() ->
     ?Z_OK(zz:union([zz:integer()]), 1).
 
-multi_branch_first_match_test() ->
-    ?Z_OK(zz:union([zz:integer(), zz:binary()]), 1).
+left_bias_when_multiple_branches_succeed_test() ->
+    First = fun(_Input) -> {ok, first} end,
+    Second = fun(_Input) -> {ok, second} end,
+    ?assertEqual({ok, first}, zz:parse(zz:union([First, Second]), input)).
 
-multi_branch_later_match_test() ->
-    ?Z_OK(zz:union([zz:integer(), zz:binary()]), <<"a">>).
+transformed_later_branch_success_test() ->
+    First = fun(_Input) -> {error, [first_failed]} end,
+    Second = fun(Input) -> {ok, {second, Input}} end,
+    ?assertEqual(
+        {ok, {second, input}},
+        zz:parse(zz:union([First, Second]), input)
+    ).
 
 multi_branch_match_in_either_order_test() ->
     ?Z_OK(zz:union([zz:binary(), zz:integer()]), <<"a">>),

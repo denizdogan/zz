@@ -65,15 +65,37 @@ nested_map_in_list_test() ->
         zz:issues(Errs)
     ).
 
-unknown_keys_test() ->
-    Z = zz:map(#{}, #{unknown_keys => strict}),
-    {error, Errs} = zz:parse(Z, #{foo => 1, bar => 2}),
-    [Issue] = zz:issues(Errs),
-    #{path := Path, code := Code, keys := Keys} = Issue,
-    ?assertEqual([], Path),
-    ?assertEqual(unknown_keys, Code),
-    true = is_list(Keys),
-    ?assertEqual([bar, foo], lists:sort(Keys)).
+nested_compound_metadata_test() ->
+    KeyParser = fun(_Key) -> {ok, same} end,
+    Z = zz:map(#{
+        payload => zz:map(#{
+            unknown => zz:map(#{}, #{unknown_keys => strict}),
+            invalid_key => zz:map_of(zz:binary(), zz:integer()),
+            invalid_value => zz:map_of(zz:binary(), zz:integer()),
+            collision => zz:map_of(KeyParser, zz:integer())
+        })
+    }),
+    Input = #{
+        payload => #{
+            unknown => #{extra => 1},
+            invalid_key => #{bad => 1},
+            invalid_value => #{<<"bad">> => bad},
+            collision => #{first => 1, second => 2}
+        }
+    },
+    {error, Errs} = zz:parse(Z, Input),
+    Expected = [
+        #{path => [payload, unknown], code => unknown_keys, keys => [extra]},
+        #{
+            path => [payload, invalid_key],
+            code => invalid_key,
+            key => bad,
+            errors => [#{path => [], code => not_binary}]
+        },
+        #{path => [payload, invalid_value, <<"bad">>], code => not_integer},
+        #{path => [payload, collision], code => map_key_collision, key => same}
+    ],
+    ?assertEqual(lists:sort(Expected), lists:sort(zz:issues(Errs))).
 
 no_match_test() ->
     Z = zz:union([zz:integer(), zz:binary()]),

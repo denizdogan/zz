@@ -6,11 +6,13 @@ empty_map_test() ->
     Z = zz:map_of(zz:binary(), zz:integer()),
     ?assertEqual({ok, #{}}, zz:parse(Z, #{})).
 
-binary_to_integer_test() ->
-    Z = zz:map_of(zz:binary(), zz:integer()),
+transformed_keys_and_values_test() ->
+    KeyParser = fun(Key) -> {ok, {parsed_key, Key}} end,
+    ValueParser = fun(Value) -> {ok, {parsed_value, Value}} end,
+    Z = zz:map_of(KeyParser, ValueParser),
     ?assertEqual(
-        {ok, #{<<"a">> => 1, <<"b">> => 2}},
-        zz:parse(Z, #{<<"a">> => 1, <<"b">> => 2})
+        {ok, #{{parsed_key, a} => {parsed_value, 1}, {parsed_key, b} => {parsed_value, 2}}},
+        zz:parse(Z, #{a => 1, b => 2})
     ).
 
 atom_to_binary_test() ->
