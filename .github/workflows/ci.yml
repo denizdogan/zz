@@ -54,6 +54,10 @@ jobs:
       - name: Format check
         run: rebar3 fmt --check
 
+      - name: Documentation
+        if: matrix.otp == '28'
+        run: rebar3 ex_doc
+
       - name: EUnit
         run: rebar3 as test do eunit --cover
 

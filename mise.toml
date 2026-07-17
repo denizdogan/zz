@@ -39,6 +39,7 @@ run = "rebar3 ex_doc"
 run = """
 rebar3 compile
 rebar3 fmt --check
+rebar3 ex_doc
 rebar3 as test do eunit
 rebar3 as test do proper
 rebar3 dialyzer

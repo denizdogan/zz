@@ -1,5 +1,7 @@
 # zz
 
+[![Hex.pm version](https://img.shields.io/hexpm/v/zz.svg)](https://hex.pm/packages/zz)
+[![HexDocs](https://img.shields.io/badge/HexDocs-Documentation-8A2BE2.svg)](https://hexdocs.pm/zz/)
 [![CI](https://github.com/denizdogan/zz/actions/workflows/ci.yml/badge.svg)](https://github.com/denizdogan/zz/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/denizdogan/zz/branch/main/graph/badge.svg)](https://codecov.io/gh/denizdogan/zz)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE.md)
