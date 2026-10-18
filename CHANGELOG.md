@@ -7,15 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-18
+
 ### Changed
 
 - Made HexDocs the prominent documentation destination in the README, Hex
   package metadata, and GitHub repository metadata.
+- Documented OTP 29 native-record behavior while retaining OTP 27 as the
+  minimum supported runtime.
 
 ### Tooling
 
-- Added ExDoc generation to the full local check and OTP 28 CI job so
-  documentation problems are caught before release.
+- Added ExDoc generation to the full local check and CI so documentation
+  problems are caught before release.
+- Moved local development, documentation CI, and Eqwalizer CI to OTP 29.1.2
+  and ELP's OTP 29.1 build. ELP now bundles Eqwalizer support, so the separate
+  Git dependency is no longer required.
+- Treat project compiler warnings as errors and isolate CI build and
+  Dialyzer caches by the resolved OTP patch version.
+- Ensure local checks and Zed launch the pinned ELP even when a debug build
+  is on `PATH`; Eqwalizer errors now explicitly fail full checks and CI.
+- Use patched Rebar3 to address Hex dependency path traversal
+  ([CVE-2026-103060](https://github.com/erlang/rebar3/security/advisories/GHSA-6ggr-r7mh-2mv8)).
 
 ## [0.3.0] - 2026-07-16
 
@@ -171,7 +184,8 @@ Initial public release.
   `list_options/0`, `map_options/0`, `schema/0`.
 - eqwalizer-clean: `elp eqwalize-all` reports no errors.
 
-[Unreleased]: https://github.com/denizdogan/zz/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/denizdogan/zz/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/denizdogan/zz/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/denizdogan/zz/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/denizdogan/zz/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/denizdogan/zz/compare/v0.1.0...v0.2.0

@@ -86,118 +86,78 @@ url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/3849249
 provenance = "github-attestations"
 
 [[tools.erlang]]
-version = "28.5.0.3"
-backend = "core:erlang"
-
-[tools.erlang.options]
-precompiled_os = "ubuntu-24.04"
-
-[tools.erlang."platforms.linux-arm64"]
-url = "https://builds.hex.pm/builds/otp/arm64/ubuntu-24.04/OTP-28.5.0.3.tar.gz"
-
-[tools.erlang."platforms.linux-arm64-musl"]
-checksum = "sha256:63c56a954fe6134f283a01312ebefad00fb0f3ac7d7d42062ca3aa8e92ccd21d"
-url = "https://github.com/erlang/otp/releases/download/OTP-28.5.0.3/otp_src_28.5.0.3.tar.gz"
-url_api = "https://api.github.com/repos/erlang/otp/releases/assets/464496685"
-install = "source"
-
-[tools.erlang."platforms.linux-x64"]
-url = "https://builds.hex.pm/builds/otp/amd64/ubuntu-24.04/OTP-28.5.0.3.tar.gz"
-
-[tools.erlang."platforms.linux-x64-musl"]
-checksum = "sha256:63c56a954fe6134f283a01312ebefad00fb0f3ac7d7d42062ca3aa8e92ccd21d"
-url = "https://github.com/erlang/otp/releases/download/OTP-28.5.0.3/otp_src_28.5.0.3.tar.gz"
-url_api = "https://api.github.com/repos/erlang/otp/releases/assets/464496685"
-install = "source"
-
-[tools.erlang."platforms.macos-arm64"]
-checksum = "sha256:3afbf057ec47bb7a24c9ce13984eab25f22388252c69ddd6ed7a3ca0321e159d"
-url = "https://github.com/erlef/otp_builds/releases/download/OTP-28.5.0.3/otp-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/464418847"
-
-[tools.erlang."platforms.macos-x64"]
-checksum = "sha256:12c44a4b50af4626f40bdc0be34d19cfa3f22c555ebca448bf8bbae9319dc55d"
-url = "https://github.com/erlef/otp_builds/releases/download/OTP-28.5.0.3/otp-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/464427726"
-
-[tools.erlang."platforms.windows-x64"]
-checksum = "sha256:fb1ff429dbd5f2c9db2c372f77794b1a590cb8e9d8c3c2d28ccc53985fa96b96"
-url = "https://github.com/erlang/otp/releases/download/OTP-28.5.0.3/otp_win64_28.5.0.3.zip"
-url_api = "https://api.github.com/repos/erlang/otp/releases/assets/464473119"
-
-[[tools.erlang]]
-version = "28.5.0.3"
+version = "29.1.2"
 backend = "core:erlang"
 
 [tools.erlang."platforms.linux-arm64-musl"]
-checksum = "sha256:63c56a954fe6134f283a01312ebefad00fb0f3ac7d7d42062ca3aa8e92ccd21d"
-url = "https://github.com/erlang/otp/releases/download/OTP-28.5.0.3/otp_src_28.5.0.3.tar.gz"
-url_api = "https://api.github.com/repos/erlang/otp/releases/assets/464496685"
+checksum = "sha256:c79966661e35fe4aff8ec003db63682e3b33b10b672220d51bf93c0a9244b049"
+url = "https://github.com/erlang/otp/releases/download/OTP-29.1.2/otp_src_29.1.2.tar.gz"
+url_api = "https://api.github.com/repos/erlang/otp/releases/assets/640997755"
 install = "source"
 
 [tools.erlang."platforms.linux-x64-musl"]
-checksum = "sha256:63c56a954fe6134f283a01312ebefad00fb0f3ac7d7d42062ca3aa8e92ccd21d"
-url = "https://github.com/erlang/otp/releases/download/OTP-28.5.0.3/otp_src_28.5.0.3.tar.gz"
-url_api = "https://api.github.com/repos/erlang/otp/releases/assets/464496685"
+checksum = "sha256:c79966661e35fe4aff8ec003db63682e3b33b10b672220d51bf93c0a9244b049"
+url = "https://github.com/erlang/otp/releases/download/OTP-29.1.2/otp_src_29.1.2.tar.gz"
+url_api = "https://api.github.com/repos/erlang/otp/releases/assets/640997755"
 install = "source"
 
 [tools.erlang."platforms.macos-arm64"]
-checksum = "sha256:3afbf057ec47bb7a24c9ce13984eab25f22388252c69ddd6ed7a3ca0321e159d"
-url = "https://github.com/erlef/otp_builds/releases/download/OTP-28.5.0.3/otp-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/464418847"
+checksum = "sha256:579af3bb043e0692503f7f24c6e65b620bdf1802a13567a7247d1d18f1ec5470"
+url = "https://github.com/erlef/otp_builds/releases/download/OTP-29.1.2/otp-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/640679208"
 
 [tools.erlang."platforms.macos-x64"]
-checksum = "sha256:12c44a4b50af4626f40bdc0be34d19cfa3f22c555ebca448bf8bbae9319dc55d"
-url = "https://github.com/erlef/otp_builds/releases/download/OTP-28.5.0.3/otp-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/464427726"
+checksum = "sha256:bac2e78f48c30ecfdbe2b2ea219856f0225530f978b344ef8bbd6a8f7e5f58c0"
+url = "https://github.com/erlef/otp_builds/releases/download/OTP-29.1.2/otp-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/640726802"
 
 [tools.erlang."platforms.windows-x64"]
-checksum = "sha256:fb1ff429dbd5f2c9db2c372f77794b1a590cb8e9d8c3c2d28ccc53985fa96b96"
-url = "https://github.com/erlang/otp/releases/download/OTP-28.5.0.3/otp_win64_28.5.0.3.zip"
-url_api = "https://api.github.com/repos/erlang/otp/releases/assets/464473119"
+checksum = "sha256:4efe9772a84c6c1ef75377e9326815584958776c905f2bf687b62509e2d809c0"
+url = "https://github.com/erlang/otp/releases/download/OTP-29.1.2/otp_win64_29.1.2.zip"
+url_api = "https://api.github.com/repos/erlang/otp/releases/assets/641103480"
 
 [[tools."github:WhatsApp/erlang-language-platform"]]
-version = "2026-06-10"
+version = "2026-10-14"
 backend = "github:WhatsApp/erlang-language-platform"
 
 [tools."github:WhatsApp/erlang-language-platform".options]
-matching = "otp-28.tar.gz"
+matching = "otp-29.1.tar.gz"
 
 [tools."github:WhatsApp/erlang-language-platform"."platforms.linux-arm64"]
-checksum = "sha256:dd33a48bc909a5e7eedb5240302e49e740faa024e3d37608bfa05b26249bee58"
-url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-06-10/elp-linux-aarch64-unknown-linux-gnu-otp-28.tar.gz"
-url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/444550540"
+checksum = "sha256:c15b7760222d9fed417b996790cd14aaf949fbe3ef113240bddc2fa7e73aec21"
+url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-linux-aarch64-unknown-linux-gnu-otp-29.1.tar.gz"
+url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/640385022"
 
 [tools."github:WhatsApp/erlang-language-platform"."platforms.linux-arm64-musl"]
-checksum = "sha256:dd33a48bc909a5e7eedb5240302e49e740faa024e3d37608bfa05b26249bee58"
-url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-06-10/elp-linux-aarch64-unknown-linux-gnu-otp-28.tar.gz"
-url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/444550540"
+checksum = "sha256:c15b7760222d9fed417b996790cd14aaf949fbe3ef113240bddc2fa7e73aec21"
+url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-linux-aarch64-unknown-linux-gnu-otp-29.1.tar.gz"
+url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/640385022"
 
 [tools."github:WhatsApp/erlang-language-platform"."platforms.linux-x64"]
-checksum = "sha256:104450964d8f43d85294d106fd6a5bf6094b88aef7a94685aeb719735d839fb7"
-url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-06-10/elp-linux-x86_64-unknown-linux-gnu-otp-28.tar.gz"
-url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/444551808"
+checksum = "sha256:3251f2d3550adf28f33529686103fabb1fbf0b0e7deb5cd06b93dab06b8647ea"
+url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-linux-x86_64-unknown-linux-gnu-otp-29.1.tar.gz"
+url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/640392067"
 
 [tools."github:WhatsApp/erlang-language-platform"."platforms.linux-x64-musl"]
-checksum = "sha256:104450964d8f43d85294d106fd6a5bf6094b88aef7a94685aeb719735d839fb7"
-url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-06-10/elp-linux-x86_64-unknown-linux-gnu-otp-28.tar.gz"
-url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/444551808"
+checksum = "sha256:3251f2d3550adf28f33529686103fabb1fbf0b0e7deb5cd06b93dab06b8647ea"
+url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-linux-x86_64-unknown-linux-gnu-otp-29.1.tar.gz"
+url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/640392067"
 
 [tools."github:WhatsApp/erlang-language-platform"."platforms.macos-arm64"]
-checksum = "sha256:ed9e8b7ae0e6eab54eec5f759570cde2f32efd060487d946ac449d7e8eec347f"
-url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-06-10/elp-macos-aarch64-apple-darwin-otp-28.tar.gz"
-url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/444562651"
+checksum = "sha256:3311edc6b4c1d6ed7cb6a8a4e37e3d8d19ffe879d006162d33753d2c72fdcdd4"
+url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-macos-aarch64-apple-darwin-otp-29.1.tar.gz"
+url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/640400321"
 
 [tools."github:WhatsApp/erlang-language-platform"."platforms.macos-x64"]
-checksum = "sha256:b8bdfdf209d34e7cf9d41220bdbb929d9cb52349a204b93e04f6fbf2abb199c0"
-url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-06-10/elp-macos-x86_64-apple-darwin-otp-28.tar.gz"
-url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/444572196"
+checksum = "sha256:2eb4b2a7a17ff96f71ff456175db7c0cc265a1cee1e616ddbfb0c02771b51ed0"
+url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-macos-x86_64-apple-darwin-otp-29.1.tar.gz"
+url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/640479997"
 
 [tools."github:WhatsApp/erlang-language-platform"."platforms.windows-x64"]
-checksum = "sha256:0060037ac353fd22908ca689e80d80d8522f98dd6ee55b977f1b7a4063514e78"
-url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-06-10/elp-windows-x86_64-pc-windows-msvc-otp-28.tar.gz"
-url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/444552277"
+checksum = "sha256:a3f5579c39f37c353ce258ec00dc5cdea0550c56ae6579206edfcd78638646e3"
+url = "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-windows-x86_64-pc-windows-msvc-otp-29.1.tar.gz"
+url_api = "https://api.github.com/repos/WhatsApp/erlang-language-platform/releases/assets/640382381"
 
 [[tools.rebar]]
-version = "3.27.0"
+version = "3.27.3"
 backend = "asdf:rebar"

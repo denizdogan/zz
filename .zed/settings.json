@@ -7,13 +7,13 @@
   "lsp": {
     "elp": {
       "binary": {
-        "path": "mise",
+        "path": "env",
         "arguments": [
-          "exec",
-          "--",
-          "env",
           "-u",
           "ELP_EQWALIZER_PATH",
+          "mise",
+          "exec",
+          "--",
           "elp",
           "server"
         ]

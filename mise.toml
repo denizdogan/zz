@@ -2,11 +2,11 @@
 lockfile = true
 
 [tools]
-erlang = "28.5.0.3"
-rebar = "3.27.0"
+erlang = "29.1.2"
+rebar = "3.27.3"
 act = "0.2.89"
 actionlint = "1.7.12"
-"github:WhatsApp/erlang-language-platform" = { version = "2026-06-10", matching = "otp-28.tar.gz", bin = "elp" }
+"github:WhatsApp/erlang-language-platform" = { version = "2026-10-14", matching = "otp-29.1.tar.gz", bin = "elp" }
 
 [tasks.compile]
 run = "rebar3 compile"
@@ -43,7 +43,7 @@ rebar3 ex_doc
 rebar3 as test do eunit
 rebar3 as test do proper
 rebar3 dialyzer
-env -u ELP_EQWALIZER_PATH elp eqwalize-all
+env -u ELP_EQWALIZER_PATH mise exec -- elp eqwalize-all --bail-on-error
 """
 
 [tasks.ci-local]
@@ -132,10 +132,10 @@ echo "Released $TAG"
 """
 
 [tasks.eq]
-run = "env -u ELP_EQWALIZER_PATH elp eqwalize"
+run = "env -u ELP_EQWALIZER_PATH mise exec -- elp eqwalize --bail-on-error"
 
 [tasks.eq-all]
-run = "env -u ELP_EQWALIZER_PATH elp eqwalize-all"
+run = "env -u ELP_EQWALIZER_PATH mise exec -- elp eqwalize-all --bail-on-error"
 
 [tasks.erl]
 run = "rebar3 shell"
