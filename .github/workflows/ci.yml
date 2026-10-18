@@ -7,8 +7,9 @@ on:
     branches: [main]
 
 env:
-  ELP_VERSION: "2026-06-10"
-  REBAR3_VERSION: "3.27.0"
+  ELP_VERSION: "2026-10-14"
+  ELP_OTP_VERSION: "29.1"
+  REBAR3_VERSION: "3.27.3"
 
 jobs:
   test:
@@ -26,6 +27,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - uses: erlef/setup-beam@v1
+        id: beam
         with:
           otp-version: ${{ matrix.otp }}
           rebar3-version: ${{ env.REBAR3_VERSION }}
@@ -35,18 +37,18 @@ jobs:
         uses: actions/cache@v6
         with:
           path: _build
-          key: ${{ runner.os }}-otp${{ matrix.otp }}-build-${{ hashFiles('rebar.lock', 'rebar.config') }}
+          key: ${{ runner.os }}-otp${{ steps.beam.outputs.otp-version }}-rebar${{ env.REBAR3_VERSION }}-build-${{ hashFiles('rebar.lock', 'rebar.config') }}
           restore-keys: |
-            ${{ runner.os }}-otp${{ matrix.otp }}-build-
+            ${{ runner.os }}-otp${{ steps.beam.outputs.otp-version }}-rebar${{ env.REBAR3_VERSION }}-build-
 
       - name: Cache dialyzer PLT
         if: ${{ !env.ACT }}
         uses: actions/cache@v6
         with:
           path: ~/.cache/rebar3
-          key: ${{ runner.os }}-otp${{ matrix.otp }}-plt-${{ hashFiles('rebar.config') }}
+          key: ${{ runner.os }}-otp${{ steps.beam.outputs.otp-version }}-rebar${{ env.REBAR3_VERSION }}-plt-${{ hashFiles('rebar.config') }}
           restore-keys: |
-            ${{ runner.os }}-otp${{ matrix.otp }}-plt-
+            ${{ runner.os }}-otp${{ steps.beam.outputs.otp-version }}-rebar${{ env.REBAR3_VERSION }}-plt-
 
       - name: Compile
         run: rebar3 compile
@@ -55,7 +57,7 @@ jobs:
         run: rebar3 fmt --check
 
       - name: Documentation
-        if: matrix.otp == '28'
+        if: matrix.otp == '29'
         run: rebar3 ex_doc
 
       - name: EUnit
@@ -78,18 +80,16 @@ jobs:
       - name: Dialyzer
         run: rebar3 dialyzer
 
-      # ELP 2026-06-10 has no OTP 29 artifact, and Eqwalizer currently fails
-      # against OTP 29-generated stdlib artifacts. Track upstream support:
-      # https://github.com/WhatsApp/erlang-language-platform/issues/214
+      # ELP artifacts target an OTP minor release; keep this in sync with mise.toml.
       - name: Install elp
-        if: matrix.otp == '28'
+        if: matrix.otp == '29'
         run: |
           ELP_ARCH=$(uname -m)
           curl -fsSL -o /tmp/elp.tar.gz \
-            "https://github.com/WhatsApp/erlang-language-platform/releases/download/${ELP_VERSION}/elp-linux-${ELP_ARCH}-unknown-linux-gnu-otp-${{ matrix.otp }}.tar.gz"
+            "https://github.com/WhatsApp/erlang-language-platform/releases/download/${ELP_VERSION}/elp-linux-${ELP_ARCH}-unknown-linux-gnu-otp-${ELP_OTP_VERSION}.tar.gz"
           tar xzf /tmp/elp.tar.gz -C /usr/local/bin
           elp version
 
       - name: Eqwalizer
-        if: matrix.otp == '28'
-        run: elp eqwalize-all
+        if: matrix.otp == '29'
+        run: elp eqwalize-all --bail-on-error

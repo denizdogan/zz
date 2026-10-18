@@ -21,8 +21,18 @@ long.
 Add to `rebar.config`:
 
 ```erlang
-{deps, [{zz, "0.3.0"}]}.
+{deps, [{zz, "0.3.1"}]}.
 ```
+
+### OTP compatibility
+
+Requires Erlang/OTP 27 or newer. CI tests OTP 27, 28, and 29; local
+development tooling targets OTP 29.1.2.
+
+OTP 29 native records are distinct from tuples and maps. `zz:any/0`,
+`zz:literal/1`, and `zz:enum/1` can accept them as opaque values, including
+inside collections. `zz:tuple/0,1` and `zz:map/0,1,2` do not validate their
+fields and reject them with `not_tuple` and `not_map`, respectively.
 
 ## Quick start
 
